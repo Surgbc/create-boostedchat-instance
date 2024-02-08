@@ -44,6 +44,8 @@ example
 ./createGCPCredentials.sh boostedchatapi somepool someprovider email1 "Surgbc/create-gcloud-vm1"
 ```
 
+Set up `WORKLOAD_IDENTITY_PROVIDER_ID` and `SERVICE_ACCOUNT` repo secrets with the values you have obtained.
+
 Refer to [this article](https://medium.com/google-cloud/how-does-the-gcp-workload-identity-federation-work-with-github-provider-a9397efd7158) for how WIF works.
 
 The procedure is condensed below: 

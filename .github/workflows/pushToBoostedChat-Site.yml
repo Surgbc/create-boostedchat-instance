@@ -2,7 +2,7 @@ name: Push to BoostedChat-Site
 
 # Define global variables
 env:
-  REPO_NAME: "boostedchat-site-tmp"
+  REPO_NAME: "boostedchat-site"
 
 on:
   push:

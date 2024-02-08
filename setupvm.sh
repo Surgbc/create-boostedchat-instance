@@ -37,7 +37,7 @@ cd boostedchat-site
 cp ./nginx-conf/nginx.conf ./nginx-conf/nginx.ssl.conf 
 cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
 
-sed -i "s/jamel/$hostname/g" ./nginx/*
+sed -i "s/jamel/$hostname/g" ./nginx-conf/*
 
 ## set up env variables
 cp /etc/boostedchat/.env ./

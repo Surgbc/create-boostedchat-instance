@@ -21,7 +21,9 @@ The `.env` file which is to be used by the new instance as well as the private k
 These will be should be saved in a vm which has already been deployed. Currently the `apiboostedchat-vm us-east1-b` is the one in use.
 
 `.env` goes to `/etc/boostedchat/.env`
-`boostedchat-site` private key goes to `/home/boostedchat/.ssh/boostedchat-site.perm`
+`boostedchat-site` private key goes to `/home/boostedchat/.ssh/boostedchat-site.pem`
+
+Boostedchat-site also assumes that there is a public key in `./key.pem` or in `/home/boostedchat/.ssh/key.pem`.
 
 **[⬆ back home](#table-of-contents)**
 

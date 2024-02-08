@@ -22,17 +22,25 @@ sudo apt install git -y
 ssh-keyscan GitHub.com > /root/.ssh/known_hosts #2>&1 >/dev/null
 ssh-keyscan GitHub.com > ~/.ssh/known_hosts #2>&1 >/dev/null
 chmod 644 ~/.ssh/known_hosts
-chmod 600 ~/.ssh/id_rsa
+chmod 600 ~/.ssh/id_rsa_git
 chmod 644 /root/.ssh/known_hosts
-chmod 600 /root/.ssh/id_rsa
+chmod 600 /root/.ssh/id_rsa_git
 
 git clone -o StrictHostKeyChecking=no git@github.com:LUNYAMWIDEVS/boostedchat-site.git
 
+hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
+
 cd boostedchat-site
+
+## nginx-config files
+cp ./nginx-conf/nginx.conf /nginx-conf/nginx.ssl.conf 
+cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
+
+sed -i "s/jamel/$hostname/g" ./nginx/*
 
 ## set up env variables
 cp /etc/boostedchat/.env ./
-hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
+
 
 ## change db name in docker-compose.yaml
 sed -i "s/POSTGRES_DB: jamel/POSTGRES_DB: $hostname/g" docker-compose.yaml  # This is hardcoded
@@ -66,5 +74,7 @@ docker compose up --build -d
 sed -i "s/^#port = 5432/port = 5434/" /opt/postgres-promptfactory-data/postgresql.conf
 
 docker compose restart postgres-promptfactory
+
+cp ./nginx-conf/nginx.ssl.conf ./nginx-conf/nginx.conf
 
 docker compose up --build -d --force-recreate

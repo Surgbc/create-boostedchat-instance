@@ -38,7 +38,7 @@ jobs:
       #    gcloud compute instances delete ${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --quiet || true
       - name: Copy privateKey from another VM
         run: |
-          gcloud compute scp root@apiboostedchat-vm:/home/boostedchat/.ssh/boostedchat-site.perm ./privateKey --zone=us-east1-b
+          gcloud compute scp root@apiboostedchat-vm:/home/boostedchat/.ssh/boostedchat-site.pem ./privateKey --zone=us-east1-b
           gcloud compute scp root@apiboostedchat-vm:/etc/boostedchat/.env ./.env.example --zone=us-east1-b
       - name: Create VM
         run: |
@@ -59,7 +59,7 @@ jobs:
           gcloud compute scp ./.env.example root@${{ steps.extract_vm_name.outputs.vm_name }}:/etc/boostedchat/.env --zone=us-central1-a
       - name: Configure Git to Use Private Key
         run: |
-          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="mkdir -p ~/.ssh && cp ~/privateKey ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa"
+          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="mkdir -p ~/.ssh && cp ~/privateKey ~/.ssh/id_rsa_git && chmod 600 ~/.ssh/id_rsa_git"
       - name: Copy SSH script to VM
         run: |
           gcloud compute scp ./setupvm.sh root@${{ steps.extract_vm_name.outputs.vm_name }}:~/setupvm.sh --zone=us-central1-a

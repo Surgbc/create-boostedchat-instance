@@ -26,7 +26,8 @@ chmod 600 ~/.ssh/id_rsa_git
 chmod 644 /root/.ssh/known_hosts
 chmod 600 /root/.ssh/id_rsa_git
 
-git clone -o StrictHostKeyChecking=no git@github.com:LUNYAMWIDEVS/boostedchat-site.git
+# git clone -o StrictHostKeyChecking=no git@github.com:LUNYAMWIDEVS/boostedchat-site.git
+GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git clone git@github.com:LUNYAMWIDEVS/boostedchat-site.git
 
 hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
 

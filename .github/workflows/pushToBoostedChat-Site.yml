@@ -1,0 +1,37 @@
+name: Push to BoostedChat-Site
+
+# Define global variables
+env:
+  REPO_NAME: "boostedchat-site-tmp"
+
+on:
+  push:
+    tags:
+      - "v*"
+permissions:
+  contents: write
+
+# jobs
+jobs:
+  build-linux-packages:
+    name: "Push to BoostedChat-Site"
+    runs-on: "ubuntu-latest"
+    steps: 
+      - uses: actions/checkout@v3
+      ## clone it first,,,, test with a differnt repo...
+      - name: Clone boostedchat-site
+        run: |
+            ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git'
+            cp setupvm.sh ./$REPO_NAME/install.sh
+      - name: Push back to repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+            # DEPLOY_TOKEN: ${{ secrets[format('DEPLOY_TOKEN_{0}', github.repository_owner)] }}
+            # API_TOKEN_GITHUB: ${{ secrets[format('DEPLOY_TOKEN_{0}', github.repository_owner)] }}
+            SOURCE_DIR: "./$REPO_NAME"
+        with:
+            source-directory: ${{ env.SOURCE_DIR }}
+            destination-github-username: ${{ github.repository_owner }}
+            destination-repository-name: ${{ env.REPO_NAME }}
+            user-email: "github-actions[bot]@users.noreply.github.com"
+            target-branch: main

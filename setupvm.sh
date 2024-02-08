@@ -1,0 +1,70 @@
+#/bin/bash
+
+## todo
+#### Copy env file manually in server
+# - [ ] in python
+# - [ ] in gh actions
+### edit env file (change db, etc...)
+
+
+sudo apt update
+sudo apt install docker.io -y
+
+# install docker compose plugins
+DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+mkdir -p $DOCKER_CONFIG/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+sudo apt install git -y
+
+
+ssh-keyscan GitHub.com > /root/.ssh/known_hosts #2>&1 >/dev/null
+ssh-keyscan GitHub.com > ~/.ssh/known_hosts #2>&1 >/dev/null
+chmod 644 ~/.ssh/known_hosts
+chmod 600 ~/.ssh/id_rsa
+chmod 644 /root/.ssh/known_hosts
+chmod 600 /root/.ssh/id_rsa
+
+git clone -o StrictHostKeyChecking=no git@github.com:LUNYAMWIDEVS/boostedchat-site.git
+
+cd boostedchat-site
+
+## set up env variables
+cp /etc/boostedchat/.env ./
+hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
+
+## change db name in docker-compose.yaml
+sed -i "s/POSTGRES_DB: jamel/POSTGRES_DB: $hostname/g" docker-compose.yaml  # This is hardcoded
+
+### change database name
+sed -i "s/^POSTGRES_DBNAME=.*/POSTGRES_DBNAME=\"$hostname\"/" .env
+echo >> .env.example
+# echo "HOSTNAME=$hostname" >> .env
+## echo "DOMAIN1=$hostname" >> .env
+## echo "DOMAIN2=$hostname" >> .env
+sed -i "s/^DOMAIN1=.*/DOMAIN1=\"$hostname\"/" .env
+sed -i "s/^DOMAIN2=.*/DOMAIN2=\"$hostname\"/" .env
+source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
+
+## log in to docker 
+docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+
+## Start the services defined in the docker-compose.airflow.yaml file
+docker compose -f docker-compose.airflow.yaml up --build -d
+
+
+## Edit postgres-etl port
+sed -i "s/^#port = 5432/port = 5433/" /opt/postgres-etl-data/postgresql.conf
+
+### restart
+docker compose -f docker-compose.airflow.yaml restart postgresetl
+docker compose -f docker-compose.airflow.yaml up --build -d
+docker compose up --build -d
+
+## Edit prompt-factory
+sed -i "s/^#port = 5432/port = 5434/" /opt/postgres-promptfactory-data/postgresql.conf
+
+docker compose restart postgres-promptfactory
+
+docker compose up --build -d --force-recreate

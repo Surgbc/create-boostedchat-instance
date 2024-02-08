@@ -1,0 +1,71 @@
+name: Create New BoostedChat Instance
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  build:
+    name: "Create Instance"
+    if: startsWith(github.event.head_commit.message, 'create vm')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get VM name from commit message
+        id: extract_vm_name
+        run: |
+          vm_message=$(echo "${{ github.event.head_commit.message }}" | grep -oP '(?<=create vm )\S+')
+          echo "::set-output name=vm_name::$vm_message"
+      - name: Login to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+      - name: set credential_file
+        run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+      - name: Run gcloud
+        run: gcloud compute instances list --zones us-east4-c
+      #- name: Delete VM if it exists
+      #  run: |
+      #    gcloud compute instances delete ${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --quiet || true
+      - name: Copy privateKey from another VM
+        run: |
+          gcloud compute scp root@apiboostedchat-vm:/home/boostedchat/.ssh/boostedchat-site.perm ./privateKey --zone=us-east1-b
+          gcloud compute scp root@apiboostedchat-vm:/etc/boostedchat/.env ./.env.example --zone=us-east1-b
+      - name: Create VM
+        run: |
+          gcloud compute instances create ${{ steps.extract_vm_name.outputs.vm_name }} \
+            --machine-type=n2-standard-2 \
+            --zone=us-central1-a \
+            --image=ubuntu-2204-jammy-v20240207a \
+            --image-project=ubuntu-os-cloud \
+            --boot-disk-size=25GB \
+            --boot-disk-type=pd-standard \
+            --tags=http-server,https-server
+      - name: Copy privateKey to VM
+        run: |
+          gcloud compute scp ./privateKey root@${{ steps.extract_vm_name.outputs.vm_name }}:~/privateKey --zone=us-central1-a
+      - name: Copy env template file
+        run: |
+          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command "mkdir -p /etc/boostedchat/ && exit"
+          gcloud compute scp ./.env.example root@${{ steps.extract_vm_name.outputs.vm_name }}:/etc/boostedchat/.env --zone=us-central1-a
+      - name: Configure Git to Use Private Key
+        run: |
+          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="mkdir -p ~/.ssh && cp ~/privateKey ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa"
+      - name: Copy SSH script to VM
+        run: |
+          gcloud compute scp ./setupvm.sh root@${{ steps.extract_vm_name.outputs.vm_name }}:~/setupvm.sh --zone=us-central1-a
+      - name: Set execute permission on the script
+        run: |
+          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="chmod +x ~/setupvm.sh"
+      - name: Run the script on the VM
+        run: |
+          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="~/setupvm.sh"

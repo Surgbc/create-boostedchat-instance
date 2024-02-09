@@ -76,6 +76,9 @@ sed -i "s/^#port = 5432/port = 5434/" /opt/postgres-promptfactory-data/postgresq
 
 docker compose restart postgres-promptfactory
 
-cp ./nginx-conf/nginx.ssl.conf ./nginx-conf/nginx.conf
+#cp ./nginx-conf/nginx.ssl.conf ./nginx-conf/nginx.conf
 
 docker compose up --build -d --force-recreate
+
+## Check logs of containers that have exited
+docker ps -a --filter "status=exited" --filter "exited=1" --format "{{.ID}} {{.Image}}" | while read -r container_id image_name; do echo ""; echo ""; echo ""; echo ""; echo ""; echo ""; echo "Container ID: $container_id, Image Name: $image_name"; docker logs "$container_id"; done

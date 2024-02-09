@@ -34,8 +34,12 @@ hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
 cd boostedchat-site
 
 ## nginx-config files
-cp ./nginx-conf/nginx.conf ./nginx-conf/nginx.ssl.conf 
-cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
+cp -r ./nginx-conf ./nginx-conf.1
+rm -rf ./nginx-conf
+mkdir ./nginx-conf
+# cp ./nginx-conf/nginx.conf ./nginx-conf/nginx.ssl.conf 
+# cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
+cp ./nginx-conf.1/nginx.nossl.conf ./nginx-conf/nginx.conf
 
 sed -i "s/jamel/$hostname/g" ./nginx-conf/*
 

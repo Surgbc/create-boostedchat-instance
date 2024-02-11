@@ -67,6 +67,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=$current_dir/
+Environment="HOME=/root"
 ExecStart=$current_dir/$script_name $env_var
 Restart=always
 RestartSec=3
@@ -115,12 +116,15 @@ initialSetup() {
     cd boostedchat-site
 
     ## nginx-config files
-    # cp -r ./nginx-conf ./nginx-conf.1
-    # rm -rf ./nginx-conf
-    # mkdir ./nginx-conf
-    cp ./nginx-conf/nginx.conf ./nginx-conf/nginx.ssl.conf 
-    cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
-    # cp ./nginx-conf.1/nginx.nossl.conf ./nginx-conf/nginx.conf
+    cp -r ./nginx-conf ./nginx-conf.1
+    rm -rf ./nginx-conf
+    mkdir ./nginx-conf 
+    # I think having both files in nginx-conf causes the error with the client container before ssl certificate is configured
+    # cp ./nginx-conf/nginx.conf ./nginx-conf/nginx.ssl.conf 
+    # cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
+    cp ./nginx-conf.1/nginx.nossl.conf ./nginx-conf/nginx.conf
+    #
+    sed -i 's/$http_host/127.0.0.1/g' ./nginx-conf/nginx.conf
 
     sed -i "s/jamel/$hostname/g" ./nginx-conf/*
 
@@ -207,7 +211,7 @@ stopAndRemoveService() {
 
 runCertbot() {
     cd /root/boostedchat-site
-    cp ./nginx-conf/nginx.ssl.conf ./nginx-conf/nginx.conf
+    cp ./nnginx-conf.1/nginx.ssl.conf ./nginx-conf/nginx.conf
     docker compose restart docker
     docker compose up --build -d --force-recreate
 }

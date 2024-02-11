@@ -68,4 +68,4 @@ jobs:
           gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="chmod +x ~/setupvm.sh"
       - name: Run the script on the VM
         run: |
-          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="~/setupvm.sh"
+          gcloud compute ssh root@${{ steps.extract_vm_name.outputs.vm_name }} --zone=us-central1-a --command="export env=\"dev\" && ~/setupvm.sh"

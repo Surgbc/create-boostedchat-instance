@@ -1,12 +1,11 @@
 #/bin/bash
 
 # Check if DEV_ENV environment variable is set
-if [ "$DEV_ENV" == "true" ]; then
+if [ "$env" == "dev" ]; then
     BRANCH="dev"
 else
     BRANCH="main"
 fi
-
 
 sudo apt update
 sudo apt install docker.io -y

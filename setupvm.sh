@@ -5,6 +5,32 @@ service_name="installboostedchat"
 my_ip=$(curl -s ifconfig.me) #dig +short myip.opendns.com @resolver1.opendns.com # wget -qO- ipinfo.io/ip
 hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
 
+isValidIp() {
+    local ip="$1"
+    local ip_pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"  # IPv4 pattern
+
+    if [[ "$ip" =~ $ip_pattern ]]; then
+        return 0  # Valid IP address
+    else
+        return 1  # Invalid IP address
+    fi
+}
+
+getMyIP() {
+    my_ip=$(curl -s ifconfig.me)
+    if ! isValidIp "$my_ip"; then 
+        my_ip=$(dig +short myip.opendns.com @resolver1.opendns.com) 
+        if ! isValidIp "$my_ip"; then 
+            my_ip=$(wget -qO- ipinfo.io/ip) 
+            if ! isValidIp "$my_ip"; then
+                echo "Failed to retrieve the IP address." >&2
+                exit 1
+            fi
+        fi
+    fi
+    echo "$my_ip"
+}
+
 
 env_var=$1
 # Check if DEV_ENV environment variable is set
@@ -44,8 +70,8 @@ WorkingDirectory=$current_dir/
 ExecStart=$current_dir/$script_name $env_var
 Restart=always
 RestartSec=3
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
@@ -153,6 +179,13 @@ projectCreated() {
 }
 
 subdomainSet() {
+    my_ip=$(getMyIP)
+    if [ $? -eq 0 ]; then
+        echo "My IP address is: $my_ip"
+    else
+        echo "Failed to retrieve my IP address ($my_ip)."
+        return 1
+    fi
     local subdomain="$hostname.boostedchat.com"
     local resolved_ip=$(dig +short "$subdomain")
 

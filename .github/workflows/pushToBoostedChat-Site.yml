@@ -20,8 +20,8 @@ jobs:
       - uses: actions/checkout@v3
       ## clone it first,,,, test with a differnt repo...
       - name: Clone boostedchat-site
-        run: |
-            ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git'
+        run: | # use the dev branch
+            ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git -b dev' 
             cp setupvm.sh ./$REPO_NAME/install.sh
       - name: Push back to repository
         uses: cpina/github-action-push-to-another-repository@main
@@ -35,4 +35,4 @@ jobs:
             destination-github-username: ${{ github.repository_owner }}
             destination-repository-name: ${{ env.REPO_NAME }}
             user-email: "github-actions[bot]@users.noreply.github.com"
-            target-branch: main
+            target-branch: dev

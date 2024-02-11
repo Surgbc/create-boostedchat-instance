@@ -1,11 +1,10 @@
 #!/bin/bash
 
 sudo docker compose stop client
-sudo docker compose rm client
-name_of_the_image=$(sudo docker compose ps --format '{{.Names}} {{.Service}}' | grep 'client' | awk '{printf "%s", $1}')
-name_of_the_image="lunyamwimages/boostedchatui:booksyus"
-# sudo docker rmi $name_of_the_image
-sudo docker rmi lunyamwimages/boostedchatui:booksyus
+sudo docker compose rm --force client
+name_of_the_image=$(docker inspect -f '{{ .Config.Image }}' boostedchat-site-client-1)
+# name_of_the_image="lunyamwimages/boostedchatui:booksyus"
+sudo docker rmi -$name_of_the_image
 
 if [[ $(sudo docker compose ps -a | grep "certbot" | awk '{print $1}') ]]; then
         sudo docker compose stop certbot

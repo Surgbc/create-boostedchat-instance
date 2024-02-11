@@ -1,10 +1,11 @@
 #/bin/bash
 
-## todo
-#### Copy env file manually in server
-# - [ ] in python
-# - [ ] in gh actions
-### edit env file (change db, etc...)
+# Check if DEV_ENV environment variable is set
+if [ "$DEV_ENV" == "true" ]; then
+    BRANCH="dev"
+else
+    BRANCH="main"
+fi
 
 
 sudo apt update
@@ -27,7 +28,7 @@ chmod 644 /root/.ssh/known_hosts
 chmod 600 /root/.ssh/id_rsa_git
 
 # git clone -o StrictHostKeyChecking=no git@github.com:LUNYAMWIDEVS/boostedchat-site.git
-GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git clone git@github.com:LUNYAMWIDEVS/boostedchat-site.git
+GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git -b $BRANCH clone git@github.com:LUNYAMWIDEVS/boostedchat-site.git
 
 hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
 

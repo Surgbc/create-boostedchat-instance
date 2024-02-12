@@ -234,8 +234,11 @@ stopAndRemoveService() {
 
 runCertbot() {
     cd /root/boostedchat-site
-    cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
     docker compose restart certbot
+    echo "Waiting for certbot to run"
+    sleep 60 
+    docker logs certbot
+    cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
     docker compose up --build -d --force-recreate
 }
 

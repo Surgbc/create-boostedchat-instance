@@ -39,3 +39,10 @@ jobs:
             run: |
                 docker build -t your-dockerhub-username/your-image-name:latest .
                 docker push your-dockerhub-username/your-image-name:latest
+        -   name: Yaml to Json
+            run: |
+                /bin/bash scripts/matrix.sh
+        -   name: Set matrix data
+            id: set-matrix
+            run: |
+                echo "matrix=$(jq -c . < ./config.json)" >> $GITHUB_OUTPUT

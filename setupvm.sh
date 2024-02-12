@@ -184,6 +184,16 @@ projectCreated() {
 }
 
 subdomainSet() {
+    local subdomain_="$hostname"
+    local domain="boostedchat.com"
+    subdomains=(
+        "${subdomain_}${domain}"
+        "airflow.${subdomain_}${domain}"
+        "api.${subdomain_}${domain}"
+        "promptemplate.${subdomain_}${domain}"
+        "scrapper.${subdomain_}${domain}"
+    )
+
     my_ip=$(getMyIP)
     if [ $? -eq 0 ]; then
         echo "My IP address is: $my_ip"
@@ -191,16 +201,28 @@ subdomainSet() {
         echo "Failed to retrieve my IP address ($my_ip)."
         return 1
     fi
-    local subdomain="$hostname.boostedchat.com"
-    local resolved_ip=$(dig +short "$subdomain")
+    # local subdomain="$hostname.boostedchat.com"
+    # local resolved_ip=$(dig +short "$subdomain")
 
-    if [ "$resolved_ip" == "$my_ip" ]; then
-        echo "The subdomain $subdomain points to the expected IP address: $my_ip"
-        return 0  # Success
-    else
-        echo "The subdomain $subdomain does not point to the expected IP address ($my_ip). Resolved IP: $resolved_ip"
-        return 1  # Failure
-    fi
+    # if [ "$resolved_ip" == "$my_ip" ]; then
+    #     echo "The subdomain $subdomain points to the expected IP address: $my_ip"
+    #     return 0  # Success
+    # else
+    #     echo "The subdomain $subdomain does not point to the expected IP address ($my_ip). Resolved IP: $resolved_ip"
+    #     return 1  # Failure
+    # fi
+    success_flag=0
+    # Iterate over each subdomain and check its resolved IP address
+    for subdomain in "${subdomains[@]}"; do
+        resolved_ip=$(dig +short "$subdomain")
+        if [ "$resolved_ip" == "$my_ip" ]; then
+            echo "The subdomain $subdomain points to the expected IP address: $my_ip"
+        else
+            echo "The subdomain $subdomain does not point to the expected IP address ($my_ip). Resolved IP: $resolved_ip"
+            return 1
+        fi
+    done
+    return 0
 }
 
 stopAndRemoveService() {

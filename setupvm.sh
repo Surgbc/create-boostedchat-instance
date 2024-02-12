@@ -127,6 +127,7 @@ initialSetup() {
     sed -i 's/$http_host/127.0.0.1/g' ./nginx-conf/nginx.conf
 
     sed -i "s/jamel/$hostname/g" ./nginx-conf/*
+    sed -i "s/jamel/$hostname/g" ./nginx-conf.1/*
 
     ## set up env variables
     cp /etc/boostedchat/.env ./
@@ -211,7 +212,7 @@ stopAndRemoveService() {
 
 runCertbot() {
     cd /root/boostedchat-site
-    cp ./nnginx-conf.1/nginx.ssl.conf ./nginx-conf/nginx.conf
+    cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
     docker compose restart docker
     docker compose up --build -d --force-recreate
 }

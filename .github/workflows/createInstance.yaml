@@ -50,6 +50,22 @@ jobs:
             --boot-disk-size=25GB \
             --boot-disk-type=pd-standard \
             --tags=http-server,https-server
+      - name: Get VM IP
+        id: get_vm_ip
+        run: |
+              VM_IP=$(gcloud compute instances describe "${{ steps.extract_vm_name.outputs.vm_name }}" \
+                          --zone=us-central1-a \
+                          --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+              echo "::set-output name=vm_ip::$VM_IP"
+          
+      - name: Create DNS Record
+        env:
+          IP: ${{ steps.get_vm_ip.outputs.vm_ip }}
+          SUBDOMAIN: ${{ steps.extract_vm_name.outputs.vm_name }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          ./createSubdomains.sh
       - name: Copy privateKey to VM
         run: |
           gcloud compute scp ./privateKey root@${{ steps.extract_vm_name.outputs.vm_name }}:~/privateKey --zone=us-central1-a

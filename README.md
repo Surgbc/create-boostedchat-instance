@@ -110,6 +110,10 @@ gcloud iam service-accounts add-iam-policy-binding <project_number>-compute@deve
 ```
 **[⬆ back home](#table-of-contents)**
 
+### Setting up cloudflare
+
+Create also the repo secrets called `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_API_TOKEN`
+
 ## Usage
 
 1. You can obtain the `service_account` and `workload_identity_provider` by running:

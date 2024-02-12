@@ -187,11 +187,11 @@ subdomainSet() {
     local subdomain_="$hostname"
     local domain="boostedchat.com"
     subdomains=(
-        "${subdomain_}${domain}"
-        "airflow.${subdomain_}${domain}"
-        "api.${subdomain_}${domain}"
-        "promptemplate.${subdomain_}${domain}"
-        "scrapper.${subdomain_}${domain}"
+        "${subdomain_}.${domain}"
+        "airflow.${subdomain_}.${domain}"
+        "api.${subdomain_}.${domain}"
+        "promptemplate.${subdomain_}.${domain}"
+        "scrapper.${subdomain_}.${domain}"
     )
 
     my_ip=$(getMyIP)

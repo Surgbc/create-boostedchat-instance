@@ -7,7 +7,11 @@ Work flow to create new instance of boostedchat. This is just meant to test the 
   - [Setting up Deploy keys](#setting-up-deploy-keys)
   - [Setting Up Secrets](#setting-up-secrets)
   - [Setting Up gCloud WIF](#setting-up-gcloud-wif)
+  - [Setting up cloudflare](#setting-up-cloudflare)
 - [Usage](#usage)
+  - [Creating new VM](#creating-new-vm)
+  - [Linking with boostedchat-site](#linking-with-boostedchat-site)
+  - [CD/CI](#cdci)
 
 ## Prerequesites
 ### Setting up Deploy keys
@@ -115,6 +119,7 @@ gcloud iam service-accounts add-iam-policy-binding <project_number>-compute@deve
 Create also the repo secrets called `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_API_TOKEN`
 
 ## Usage
+### Creating new VM
 
 1. You can obtain the `service_account` and `workload_identity_provider` by running:
 
@@ -138,7 +143,7 @@ A vm with the name `<vm_name>` will be created when you push the commit.
 
 **[⬆ back home](#table-of-contents)**
 
-## Linking with boostedchat-site
+### Linking with boostedchat-site
 
 The development of the script is best done and tested independently from the rest of the work in `boostedchat-site`. Integrating it with the rest of the `boostedchat-site` work requires some integration.
 
@@ -150,5 +155,8 @@ To integrate the changes, create a new tag using:
 git tag vx.x.x
 git push origin vx.x.x
 ```
+
+### CD/CI
+s
 
 **[⬆ back home](#table-of-contents)**

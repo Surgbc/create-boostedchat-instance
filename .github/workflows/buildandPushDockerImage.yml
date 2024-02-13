@@ -34,7 +34,7 @@ jobs:
       runs-on: ubuntu-latest
       needs: setup
       strategy:
-        matrix: ${{ fromJson(needs.yaml_to_json.outputs.matrix) }}
+        matrix: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
       steps:
         - name: Set Docker secrets based on branch
           if: github.ref == 'refs/heads/dev'

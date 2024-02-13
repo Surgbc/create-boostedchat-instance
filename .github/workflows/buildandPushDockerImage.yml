@@ -26,6 +26,7 @@ jobs:
           id: set-matrix
           run: |
             echo "matrix=$(jq -c . < ./config.json)" >> $GITHUB_OUTPUT
+            cat ./config.json
     loop:
       runs-on: ubuntu-latest
       needs: setup

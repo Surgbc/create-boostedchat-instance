@@ -63,6 +63,6 @@ jobs:
             ref: ${{ matrix.service }}-${{ matrix.branch }} 
         - name: Build and push Docker image
           run: |
-            docker build -t ${{ matrix.image_name }} .
-            docker push y${{ matrix.image_name }}
+            docker build -t ${{ matrix.image }} .
+            docker push ${{ matrix.image }}
   

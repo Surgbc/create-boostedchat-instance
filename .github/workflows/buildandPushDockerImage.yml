@@ -16,6 +16,7 @@ jobs:
           run: |
             branch_message=$(echo "${{ github.event.head_commit.message }}" | grep -oP '(?<=build and deploy )\S+')
             echo "::set-output name=branch::$branch_message"
+            echo "found branch: $branch_message"
   
         - name: Yaml to Json
           env:

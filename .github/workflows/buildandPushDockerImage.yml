@@ -12,17 +12,17 @@ jobs:
       steps:
         - uses: actions/checkout@v3
         - name: Get VM name from commit message
-          id: extract_vm_name
+          id: extract_branch_name
           run: |
             branch_message=$(echo "${{ github.event.head_commit.message }}" | grep -oP '(?<=build and deploy )\S+')
             echo "::set-output name=branch::$branch_message"
+            echo "branch=$branch_message"  >> $GITHUB_ENV
             echo "found branch: $branch_message"
   
         - name: Yaml to Json
           env:
-            branch: ${{ steps.yaml_to_json.outputs.branch }}
+            branch: ${{ steps.extract_branch_name.outputs.branch }}
           run: |
-            export branch=${{ steps.yaml_to_json.outputs.branch }}
             /bin/bash matrix.sh
         - name: Set matrix data
           id: set-matrix

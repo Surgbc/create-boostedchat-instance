@@ -33,5 +33,6 @@ for service in $services; do
     echo "{\"service\":\"$service\", \"image\":\"$image_name\", \"repo\":\"$repository\", \"branch\":\"$branch\"  }">> config.json
     echo "," >> config.json
 done
+cat config.json
 awk 'NR>1 {print prev} {prev=$0} END {print "]}" }' config.json > temp && mv temp config.json # replace last ,
 echo $services

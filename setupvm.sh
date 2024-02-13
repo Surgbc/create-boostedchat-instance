@@ -242,6 +242,8 @@ runCertbot() {
     docker compose up --build -d --force-recreate
 }
 
+## replace with docker function
+
 if ! serviceExists; then
     createService
 else 

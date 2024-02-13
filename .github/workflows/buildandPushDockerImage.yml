@@ -39,16 +39,15 @@ jobs:
         - setup
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
-        branch: ${{ fromJson(needs.setup.outputs.branch) }}
       steps:
         - name: Set Docker secrets based on branch
-          if: github.ref == 'refs/heads/dev'
+          if: ${{ needs.setup.outputs.branch }} == 'dev'
           run: |
             echo "DOCKER_USERNAME=${{ secrets.DEV_DOCKER_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.DEV_DOCKER_PASSWORD }}" >> $GITHUB_ENV
         
         - name: Set Docker secrets based on branch
-          if: github.ref == 'refs/heads/main'
+          if: ${{ needs.setup.outputs.branch }} == 'main'
           run: |
             echo "DOCKER_USERNAME=${{ secrets.MAIN_DOCKER_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.MAIN_DOCKER_PASSWORD }}" >> $GITHUB_ENV

@@ -21,9 +21,10 @@ EOF
 copy_docker_yaml_and_create_function
 
 # add to setupvm.sh
-replacement_file="setupvm.sh"
+replacement_file="save_docker_yaml_function.sh"
 line_marker="## replace with docker function"
 
+echo "asdashdk"
 # Perform the replacement
 sed -i "/$line_marker/{r $replacement_file
-        d}" save_docker_yaml_function.sh
+        d}" setupvm.sh

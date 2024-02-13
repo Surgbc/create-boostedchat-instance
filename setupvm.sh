@@ -242,6 +242,7 @@ runCertbot() {
     docker compose up --build -d --force-recreate
 }
 
+## leave the line that follows as is. It is used as a line_marker for a function which will be created here by copy_dev_docker_file.sh
 ## replace with docker function
 
 if ! serviceExists; then

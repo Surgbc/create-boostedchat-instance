@@ -20,6 +20,7 @@ jobs:
         run: |
           vm_message=$(echo "${{ github.event.head_commit.message }}" | grep -oP '(?<=create vm )\S+')
           echo "::set-output name=vm_name::$vm_message"
+
       - name: Login to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
@@ -27,10 +28,13 @@ jobs:
           token_format: access_token
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.3.0
+
       - name: set credential_file
         run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
+        
       - name: Run gcloud
         run: gcloud compute instances list --zones us-east4-c
       #- name: Delete VM if it exists

@@ -1,2 +1,20 @@
-dev:
-  
+build: # images to build
+  dev:
+    client: 
+      "lunyamwimages/boostedchatui-dev:latest": "LUNYAMWIDEVS/boostedchat.git      dev"
+  main: # not yet implemented
+
+use: # images to use in the deployment
+  dev:
+    api: "lunyamwimages/boostedchatapi:booksyus"      # not changed
+    postgres: "postgres:latest"                       # not changed
+    postgres-promptfactory: "postgres:latest"         # not changed
+    client: "lunyamwimages/boostedchatui-dev:latest"
+    certbot: "lunyamwimages/boostedchatmqtt"          # not changed
+    prompt: "lunyamwimages/promptfactory"             # not changed
+    salesrep: "lunyamwimages/boostedchatamqp"         # needs to be removed
+    message-broker: "rabbitmq:3-management-alpine"    # needs to be removed
+
+
+  main: # not yet implemented
+

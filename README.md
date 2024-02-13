@@ -157,6 +157,13 @@ git push origin vx.x.x
 ```
 
 ### CD/CI
-s
+Create repo secrets `DEV_DOCKER_USERNAME`, `DEV_DOCKER_PASSWORD`, `MAIN_DOCKER_USERNAME`, `MAIN_DOCKER_PASSWORD` which are the credentials for the accounts to use for docker in development mode of production. They could refer to the same account though. 
+
+`images.yaml` contains a `build` and `use` which contain respectively the images to build for `dev` and `production (main) ` and the images to use for the services defined for both `dev` and production `setups`. The main section of use could be ignored since it is already contained in `docker-compose.yaml` of the `-site` repo.
+
+### Setting up the holding repo
+We could use a `personal access token` for cloning the repos for which we want to build images. This is be the cleanest way. The other option might be to set up ssh (deploy) keys for all repos that we need to interact with. This is tedious work. The other option is to create build pipelines in each repo. This will involve the management of DOCKER credentials in all these repos, which is also hard work. The other option is to have the individual repos push their work to a holding repo (a deploy key will only be required for the holding repo). Then we can pull from that repo when building. This is the path we have chosen. We will use this same repo as the holding repo.
+
+Therefore a deploy key for this repo is required. Save the key as `HOLDING_REPO` Refer to [Setting up Deploy keys](#setting-up-deploy-keys) on how to do this.
 
 **[⬆ back home](#table-of-contents)**

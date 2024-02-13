@@ -146,6 +146,10 @@ initialSetup() {
     sed -i "s/^DOMAIN2=.*/DOMAIN2=\"$hostname\"/" .env
     source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
 
+    if [ "$BRANCH" == "dev" ]; then
+        save_docker_yaml
+    fi
+
     ## log in to docker 
     docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
 

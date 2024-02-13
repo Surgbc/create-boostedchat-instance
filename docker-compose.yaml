@@ -44,7 +44,7 @@ services:
       - booksy
 
   client:
-    image: lunyamwimages/boostedchatui:booksyus
+    image: lunyamwimages/boostedchatui-dev:latest
     restart: always
     depends_on:
       - api

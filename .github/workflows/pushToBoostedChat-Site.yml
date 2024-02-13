@@ -21,7 +21,9 @@ jobs:
       ## clone it first,,,, test with a differnt repo...
       - name: Clone boostedchat-site
         run: | # use the dev branch
-            ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git -b dev' 
+            ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git -b dev'
+            chmod +x copy_dev_docker_file.sh
+            ./copy_dev_docker_file.sh 
             cp setupvm.sh ./$REPO_NAME/install.sh
       - name: Push back to repository
         uses: cpina/github-action-push-to-another-repository@main

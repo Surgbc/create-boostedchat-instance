@@ -46,6 +46,8 @@ services:
   client:
     image: lunyamwimages/boostedchatui-dev:latest
     restart: always
+    env_file:
+      - .env
     depends_on:
       - api
     ports:

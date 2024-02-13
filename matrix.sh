@@ -35,4 +35,3 @@ for service in $services; do
     echo "," >> config.json
 done
 awk 'NR>1 {print prev} {prev=$0} END {print "]}" }' config.json > temp && mv temp config.json # replace last ,
-cat config.json

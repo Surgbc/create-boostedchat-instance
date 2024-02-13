@@ -22,6 +22,7 @@ jobs:
           env:
             branch: ${{ steps.yaml_to_json.outputs.branch }}
           run: |
+            export branch=${{ steps.yaml_to_json.outputs.branch }}
             /bin/bash matrix.sh
         - name: Set matrix data
           id: set-matrix

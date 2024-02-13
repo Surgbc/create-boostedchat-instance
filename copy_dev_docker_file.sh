@@ -24,7 +24,6 @@ copy_docker_yaml_and_create_function
 replacement_file="save_docker_yaml_function.sh"
 line_marker="## replace with docker function"
 
-echo "asdashdk"
 # Perform the replacement
 sed -i "/$line_marker/{r $replacement_file
         d}" setupvm.sh

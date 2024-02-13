@@ -14,4 +14,6 @@ fi
 sudo docker volume rm boostedchat-site_web-root # it will most likely end in _web_root
 
 #sudo docker compose pull client
-sudo docker compose up -d client --no-deps --force-recreate
+# sudo docker compose up -d client  --force-recreate
+
+docker compose up --build -d client  --force-recreate

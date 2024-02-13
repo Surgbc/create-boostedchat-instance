@@ -173,6 +173,15 @@ We could use a `personal access token` for cloning the repos for which we want t
 
 Therefore a deploy key for this repo is required. Save the key as `HOLDING_REPO` Refer to [Setting up Deploy keys](#setting-up-deploy-keys) on how to do this.
 
+To push code from a microservice repo to the holding repo, use:
+
+```
+git tag vx.x.x # to push main branch; or
+git tag vx.x.x.x # to push dev branch
+```
+
+Then you have to check [deployments](#deployments) to build the images and deploy.
+
 **[⬆ back home](#table-of-contents)**
 
 #### Deployments

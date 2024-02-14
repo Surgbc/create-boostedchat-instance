@@ -24,7 +24,7 @@ savePullUpdatedImages() {
     cat <<DOC_EOF > /root/boosted-chat/pullUpdatedImages.sh
 $(<pullUpdatedImages.sh)
 DOC_EOF
-    echo "Docker YAML content saved successfully."
+    echo "pullUpdatedImages.sh content saved successfully."
 }
 EOF
 
@@ -32,20 +32,20 @@ EOF
         echo "Error: pullUpdatedImages.sh file not found."
     fi
     
-    if [ -f "watch.sh" ]; then
-        # Create a function to save the contents of docker.yaml
-        cat <<EOF > saveWatch.sh
-saveWatch() {
-    cat <<DOC_EOF > /root/watch.sh
-$(<watch.sh)
-DOC_EOF
-    echo "Docker YAML content saved successfully."
-}
-EOF
+#     if [ -f "watch.sh" ]; then
+#         # Create a function to save the contents of docker.yaml
+#         cat <<EOF > saveWatch.sh
+# saveWatch() {
+#     cat <<DOC_EOF > /root/watch.sh
+# $(<watch.sh)
+# DOC_EOF
+#     echo "Docker YAML content saved successfully."
+# }
+# EOF
 
-    else
-        echo "Error: pullUpdatedImages.sh file not found."
-    fi
+#     else
+#         echo "Error: pullUpdatedImages.sh file not found."
+#     fi
 }
 
 copy_docker_yaml_and_create_function

@@ -6,7 +6,11 @@ command -v inotifywait >/dev/null 2>&1 || { echo >&2 "inotifywait is required bu
 
 # Define the file to watch
 file_to_watch="/root/update"
-touch "$file_to_watch"
+
+if [ -f "/root/watch.sh" ]; then
+    touch "$file_to_watch"
+fi
+
 
 # Function to execute when file changes
 on_file_change() {

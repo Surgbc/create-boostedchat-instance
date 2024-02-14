@@ -99,6 +99,7 @@ jobs:
               sleep 10 # wait for first process to generate ssh key
               gcloud compute ssh $instance --zone=$zone --command "echo \$(date) | sudo tee /root/update" &
             done <<< "$(gcloud compute instances list --format="value(name,zone)")"
+            wait 
 
    
   

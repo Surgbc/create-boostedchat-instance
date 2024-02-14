@@ -4,7 +4,7 @@ copy_docker_yaml_and_create_function() {
     # Check if docker.yaml file exists
     if [ -f "docker-compose.yaml" ]; then
         # Create a function to save the contents of docker.yaml
-        cat <<EOF > save_docker_yaml_function.sh
+        cat <<'EOF' > save_docker_yaml_function.sh
 save_docker_yaml() {
     cat <<DOC_EOF > docker-compose.yaml
 $(<docker-compose.yaml)
@@ -19,7 +19,7 @@ EOF
 
     if [ -f "pullUpdatedImages.sh" ]; then
         # Create a function to save the contents of docker.yaml
-        cat <<EOF > savepullUpdatedImages.sh
+        cat <<'EOF' > savepullUpdatedImages.sh
 savePullUpdatedImages() {
     cat <<DOC_EOF > /root/pullUpdatedImages.sh
 $(<pullUpdatedImages.sh)
@@ -34,7 +34,7 @@ EOF
     
     if [ -f "watch.sh" ]; then
         # Create a function to save the contents of docker.yaml
-        cat <<EOF > saveWatch.sh
+        cat <<'EOF' > saveWatch.sh
 saveWatch() {
     cat <<DOC_EOF > /root/watch.sh
 $(<watch.sh)

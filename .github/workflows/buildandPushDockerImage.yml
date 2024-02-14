@@ -93,13 +93,25 @@ jobs:
         #     gcloud compute instances list --format="value(name)" > instances.txt
 
         - name: SSH and Update File
-          run: |
-            while read -r instance zone; do
-              echo "Instance: $instance, Zone: $zone"
-              sleep 10 # wait for first process to generate ssh key
-              gcloud compute ssh $instance --zone=$zone --command "echo \$(date) | sudo tee /root/update" &
-            done <<< "$(gcloud compute instances list --format="value(name,zone)")"
-            wait 
+          run: | # the while loop is not asynchronous
+            # while read -r instance zone; do
+            #   echo "Instance: $instance, Zone: $zone"
+            #   sleep 10 # wait for first process to generate ssh key
+            #   gcloud compute ssh $instance --zone=$zone --command "echo \$(date) | sudo tee /root/update" &
+            # done <<< "$(gcloud compute instances list --format="value(name,zone)")"
+            # wait 
+            
+            
+            vm_list=($(gcloud compute instances list --format="value(name)"))
+
+            # Define your SSH command template
+            ssh_template="gcloud compute ssh %s --zone=your_zone --command \"echo \$(date) | sudo tee /root/update\""
+
+            # Loop over the VM list and generate SSH commands
+            for vm in "${vm_list[@]}"; do
+                # Print the SSH command for each VM
+                printf "%s\n" "$(printf "$ssh_template" "$vm")"
+            done
 
    
   

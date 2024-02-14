@@ -280,12 +280,30 @@ stopAndRemoveService() {
     sudo systemctl daemon-reload
 }
 
+check_certificates_exists() {
+    local file_exists=false
+
+    # Iterate through each container
+    for container_id in $(docker ps -q); do
+        # docker exec "$container_id" test -e "/etc/letsencrypt/live/$hostname.boostedchat.com/privkey.pem" && file_exists=true
+        if docker exec "$container_id" test -e "/etc/letsencrypt/live/$hostname.boostedchat.com/privkey.pem"; then
+            # Return true if the file exists in any container
+            return 0
+        fi
+    done
+    return 1
+}
+
 runCertbot() {
     cd /root/boostedchat-site
-    docker compose restart certbot
-    echo "Waiting for certbot to run"
-    sleep 60 
-    docker logs certbot
+
+    if ! check_certificates_exists; then 
+        # check if certificate already exist
+        docker compose restart certbot
+        echo "Waiting for certbot to run"
+        sleep 60 
+        docker logs certbot
+    fi
     cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
     docker compose up --build -d --force-recreate
 }

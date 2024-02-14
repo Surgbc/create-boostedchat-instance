@@ -93,7 +93,7 @@ jobs:
         #     gcloud compute instances list --format="value(name)" > instances.txt
 
         - name: SSH and Update File
-          run: | # the while loop is not asynchronous
+          run: | # the while loop does not await
             # while read -r instance zone; do
             #   echo "Instance: $instance, Zone: $zone"
             #   sleep 10 # wait for first process to generate ssh key

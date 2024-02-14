@@ -24,6 +24,7 @@ savePullUpdatedImages() {
     cat <<'DOC_EOF' > /root/pullUpdatedImages.sh
 $(<pullUpdatedImages.sh)
 DOC_EOF
+    chmod +x /root/pullUpdatedImages.sh
     echo "pullUpdatedImages.sh content saved successfully."
 }
 EOF
@@ -39,6 +40,7 @@ saveWatch() {
     cat <<'DOC_EOF' > /root/watch.sh
 $(<watch.sh)
 DOC_EOF
+    chmod +x /root/watch.sh
     echo "watch.sh content saved successfully."
 }
 EOF

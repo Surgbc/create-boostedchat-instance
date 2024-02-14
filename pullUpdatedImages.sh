@@ -35,6 +35,7 @@ if [ ${#services_to_restart[@]} -eq 0 ]; then
 else
     echo "Restarting services:"
     for service in "${services_to_restart[@]}"; do
+        echo "Restarting $service"
         docker compose -f "$compose_file" restart "$service"
     done
 fi

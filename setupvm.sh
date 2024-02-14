@@ -297,8 +297,12 @@ runCertbot() {
 
 ## replace with saveWatch
 
-if [ -f "/root/watch.sh" ]; then
+if [ ! -f "/root/watch.sh" ]; then
     createUpdateService
+fi
+
+if [ ! -f "/root/pullUpdatedImages.sh" ]; then
+    savePullUpdatedImages
 fi
 
 if ! serviceExists; then
@@ -307,7 +311,6 @@ else
     if ! projectCreated; then
         initialSetup
     else
-        savePullUpdatedImages
         if subdomainSet; then
             runCertbot
             stopAndRemoveService

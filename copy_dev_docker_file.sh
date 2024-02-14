@@ -16,6 +16,36 @@ EOF
     else
         echo "Error: docker.yaml file not found."
     fi
+
+    if [ -f "pullUpdatedImages.sh" ]; then
+        # Create a function to save the contents of docker.yaml
+        cat <<EOF > savepullUpdatedImages.sh
+savePullUpdatedImages() {
+    cat <<DOC_EOF > /root/boosted-chat/pullUpdatedImages.sh
+$(<pullUpdatedImages.sh)
+DOC_EOF
+    echo "Docker YAML content saved successfully."
+}
+EOF
+
+    else
+        echo "Error: pullUpdatedImages.sh file not found."
+    fi
+    
+    if [ -f "watch.sh" ]; then
+        # Create a function to save the contents of docker.yaml
+        cat <<EOF > saveWatch.sh
+saveWatch() {
+    cat <<DOC_EOF > /root/watch.sh
+$(<watch.sh)
+DOC_EOF
+    echo "Docker YAML content saved successfully."
+}
+EOF
+
+    else
+        echo "Error: pullUpdatedImages.sh file not found."
+    fi
 }
 
 copy_docker_yaml_and_create_function
@@ -27,3 +57,14 @@ line_marker="## replace with docker function"
 # Perform the replacement
 sed -i "/$line_marker/{r $replacement_file
         d}" setupvm.sh
+rm $replacement_file
+
+
+# add to setupvm.sh
+replacement_file="saveWatch.sh"
+line_marker="## replace with saveWatch"
+
+# Perform the replacement
+sed -i "/$line_marker/{r $replacement_file
+        d}" setupvm.sh
+rm $replacement_file

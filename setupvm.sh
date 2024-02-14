@@ -306,9 +306,11 @@ runCertbot() {
         echo "Waiting for certbot to run"
         sleep 60 
         docker logs certbot
+        
+        cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
+        docker compose up --build -d --force-recreate
     fi
-    cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
-    docker compose up --build -d --force-recreate
+    
 }
 
 ## leave the lines that follow as is. It is used as a line_marker for a function which will be created here by copy_dev_docker_file.sh

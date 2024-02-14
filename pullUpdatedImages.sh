@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /root/boosted-chat
+cd /root/boostedchat-site
 # Find the docker-compose file
 compose_file=$(find . -type f \( -name "docker-compose.yml" -o -name "docker-compose.yaml" \))
 

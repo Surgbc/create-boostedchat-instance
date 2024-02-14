@@ -232,6 +232,9 @@ projectCreated() {
 }
 
 subdomainSet() {
+    if certificates_exist; then 
+        return 0
+    fi
     local subdomain_="$hostname"
     local domain="boostedchat.com"
     subdomains=(
@@ -280,7 +283,7 @@ stopAndRemoveService() {
     sudo systemctl daemon-reload
 }
 
-check_certificates_exists() {
+certificates_exist() {
     local file_exists=false
 
     # Iterate through each container
@@ -297,13 +300,13 @@ check_certificates_exists() {
 runCertbot() {
     cd /root/boostedchat-site
 
-    if ! check_certificates_exists; then 
+    # if ! certificates_exist; then 
         # check if certificate already exist
         docker compose restart certbot
         echo "Waiting for certbot to run"
         sleep 60 
         docker logs certbot
-    fi
+    # fi
     cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
     docker compose up --build -d --force-recreate
 }

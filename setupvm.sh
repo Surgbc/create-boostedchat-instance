@@ -300,13 +300,13 @@ certificates_exist() {
 runCertbot() {
     cd /root/boostedchat-site
 
-    # if ! certificates_exist; then 
+    if ! certificates_exist; then 
         # check if certificate already exist
         docker compose restart certbot
         echo "Waiting for certbot to run"
         sleep 60 
         docker logs certbot
-    # fi
+    fi
     cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
     docker compose up --build -d --force-recreate
 }

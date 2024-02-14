@@ -2,6 +2,7 @@
 
 ## globals
 service_name="installboostedchat"
+update_service_name="updateboostedchat"
 my_ip=$(curl -s ifconfig.me) #dig +short myip.opendns.com @resolver1.opendns.com # wget -qO- ipinfo.io/ip
 hostname=$(sed 's/\n//g' /etc/hostname) # assume hostname to be the new username
 
@@ -87,6 +88,44 @@ EOF
 
     # Check service status
     sudo systemctl status $service_name
+}
+
+
+createUpdateService() {
+    saveWatch #/root/watch.sh
+    local current_dir=$(pwd)
+    local script_name="watch.sh"
+    local service_file="/etc/systemd/system/$update_service_name.service"
+
+    # Create the service unit file
+    cat <<EOF > "/etc/systemd/system/$update_service_name.service"
+[Unit]
+Description=Update boostedchat service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$current_dir/
+Environment="HOME=/root"
+ExecStart=$current_dir/$script_name
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Reload systemd to read the newly added unit files
+    sudo systemctl daemon-reload
+
+    # Start and enable the service
+    sudo systemctl start $update_service_name
+    sudo systemctl enable $update_service_name
+
+    # Check service status
+    sudo systemctl status $update_service_name
 }
 
 
@@ -253,12 +292,17 @@ runCertbot() {
 
 ## replace with saveWatch
 
+if [ -f "/root/watch.sh" ]; then
+    createUpdateService
+fi
+
 if ! serviceExists; then
     createService
 else 
     if ! projectCreated; then
         initialSetup
     else
+        savePullUpdatedImages
         if subdomainSet; then
             runCertbot
             stopAndRemoveService

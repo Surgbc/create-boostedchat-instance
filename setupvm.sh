@@ -97,6 +97,11 @@ createUpdateService() {
     local script_name="watch.sh"
     local service_file="/etc/systemd/system/$update_service_name.service"
 
+    sudo systemctl stop $service_name
+    sudo systemctl disable $service_name
+    if [ -f "/etc/systemd/system/$update_service_name.service" ]; then
+        sudo rm /etc/systemd/system/$service_name.service
+    fi
     # Create the service unit file
     cat <<EOF > "/etc/systemd/system/$update_service_name.service"
 [Unit]

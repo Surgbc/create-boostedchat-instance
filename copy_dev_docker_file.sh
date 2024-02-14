@@ -21,7 +21,7 @@ EOF
         # Create a function to save the contents of docker.yaml
         cat <<EOF > savepullUpdatedImages.sh
 savePullUpdatedImages() {
-    cat <<DOC_EOF > /root/boostedchat-site/pullUpdatedImages.sh
+    cat <<DOC_EOF > /root/pullUpdatedImages.sh
 $(<pullUpdatedImages.sh)
 DOC_EOF
     echo "pullUpdatedImages.sh content saved successfully."

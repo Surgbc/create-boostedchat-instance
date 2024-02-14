@@ -61,6 +61,16 @@ rm $replacement_file
 
 
 # add to setupvm.sh
+replacement_file="savepullUpdatedImages.sh"
+line_marker="## replace with savepullUpdatedImages"
+
+# Perform the replacement
+sed -i "/$line_marker/{r $replacement_file
+        d}" setupvm.sh
+rm $replacement_file
+
+
+# add to setupvm.sh
 replacement_file="saveWatch.sh"
 line_marker="## replace with saveWatch"
 

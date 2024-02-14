@@ -157,14 +157,19 @@ To integrate the changes, create a new tag using:
 git tag vx.x.x
 git push origin vx.x.x
 ```
+
+This process pushes the `setupvm.sh` file into the `dev` branch of `site`. It add to it functions which will create `docker-compose.yaml` in the server in case it is a dev setup as well as the two files `watch.sh` and `pullUpdatesImages.sh` which are used for CD/CI.
+
 **[⬆ back home](#table-of-contents)**
 
 ### CD/CI
 Create repo secrets `DEV_DOCKER_USERNAME`, `DEV_DOCKER_PASSWORD`, `MAIN_DOCKER_USERNAME`, `MAIN_DOCKER_PASSWORD` which are the credentials for the accounts to use for docker in development mode of production. They could refer to the same account though. 
 
-`images.yaml` contains a `build` and `use` which contain respectively the images to build for `dev` and `production (main) ` and the images to use for the services defined for both `dev` and production `setups`. The main section of use could be ignored since it is already contained in `docker-compose.yaml` of the `-site` repo.
+`images.yaml` contains a `build` and `use` which contain respectively the images to build for `dev` and `production (main) ` and the images to use for the services defined for both `dev` and production `setups`. The images in the main section should be the same as those in `docker-compose.yaml` of `-site` repo. For now you have to sync these 2 lists manually.
 
-For now the images to be used in `dev` setu-up have to be manually defined in the `docker-compose.yaml` file contained in this repo. The contents of this file are copied to the `setupvm/install.sh` file when deploying to the `-site` repo. That function copies those contents to the `docker-compose.yaml` file on the vm if the environment is set as `dev`.
+For now the images to be used in `dev` set-up have to be manually defined in the `docker-compose.yaml` file contained in this repo. The contents of this file are copied to the `setupvm/install.sh` file when deploying to the `-site` repo. That function copies those contents to the `docker-compose.yaml` file on the vm if the environment is set as `dev`.
+
+
 
 **[⬆ back home](#table-of-contents)**
 

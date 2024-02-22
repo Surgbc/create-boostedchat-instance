@@ -57,6 +57,7 @@ jobs:
             cd $dir
             rm -rf .git
             cp -r /tmp/repo/.git ./
+            rm -rf .github
             ls -lha
             commit_url="https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
             git add . && git commit -m "Update from $commit_url"

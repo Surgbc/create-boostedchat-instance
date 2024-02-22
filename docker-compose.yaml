@@ -2,7 +2,7 @@ version: "3"
 
 services:
   api:
-    image: lunyamwimages/boostedchatapi:booksyus
+    image: lunyamwimages/boostedchatapi-dev:latest
     restart: always
     ports:
       - "8000:8000"

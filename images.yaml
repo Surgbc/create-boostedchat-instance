@@ -1,12 +1,14 @@
 build: # images to build
   dev:
     client: 
-      "lunyamwimages/boostedchatui-dev:latest": "LUNYAMWIDEVS/boostedchat.git      dev"
+      "lunyamwimages/boostedchatui-dev:latest": "LUNYAMWIDEVS/boostedchat.git      dev" # the repo url is no longer being used, but still require a value to be supplied
+    api: 
+      "lunyamwimages/boostedchatapi-dev:latest": "LUNYAMWIDEVS/boostedchat-api.git      dev"
   main: # not yet implemented
 
 use: # images to use in the deployment
   dev:
-    api: "lunyamwimages/boostedchatapi:booksyus"      # not changed
+    api: "lunyamwimages/boostedchatapi-dev:latest"    
     postgres: "postgres:latest"                       # not changed
     postgres-promptfactory: "postgres:latest"         # not changed
     client: "lunyamwimages/boostedchatui-dev:latest"

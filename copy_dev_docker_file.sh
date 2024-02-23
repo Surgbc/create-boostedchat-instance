@@ -8,7 +8,7 @@ copy_docker_yaml_and_create_function() {
         # Create a function to save the contents of docker.yaml
         cat <<EOF > save_docker_yaml_function.sh
 save_docker_yaml() {
-    cat <<'DOC_EOF' > docker-compose.yaml
+    cat <<'DOC_EOF' > /root/boostedchat-site/docker-compose.yaml
 $(<docker-compose.yaml)
 DOC_EOF
     echo "Docker YAML content saved successfully."
@@ -23,7 +23,7 @@ EOF
         # Create a function to save the contents of docker.yaml
         cat <<EOF > save_docker_airflow_yaml_function.sh
 save_docker_airflow_yaml() {
-    cat <<'DOC_EOF' > docker-compose.airflow.yaml
+    cat <<'DOC_EOF' > /root/boostedchat-site/docker-compose.airflow.yaml
 $(<docker-compose.airflow.yaml)
 DOC_EOF
     echo "Docker YAML content saved successfully."
@@ -70,7 +70,7 @@ EOF
         # Create a function to save the contents of docker.yaml
         cat <<EOF > saveCertbot-entrypoint.sh
 saveCertbotEntry() {
-    cat <<'DOC_EOF' > certbot-entrypoint.sh
+    cat <<'DOC_EOF' > /root/boostedchat-site/certbot-entrypoint.sh
 $(<certbot-entrypoint.sh)
 DOC_EOF
     chmod +x certbot-entrypoint.sh

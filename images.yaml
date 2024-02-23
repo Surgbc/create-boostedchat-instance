@@ -5,8 +5,11 @@ build: # images to build
     api: 
       "lunyamwimages/boostedchatapi-dev:latest": "LUNYAMWIDEVS/boostedchat-api.git      dev"
   main: # not yet implemented
+  airflow-dev:
+    web: 
+      "lunyamwimages/scrapper-dev:latest": "LUNYAMWIDEVS/boostedchat-scrapper.git      dev"
 
-use: # images to use in the deployment
+use: # images to use in the deployment. This section is not yet used. 
   dev:
     api: "lunyamwimages/boostedchatapi-dev:latest"    
     postgres: "postgres:latest"                       # not changed
@@ -17,6 +20,8 @@ use: # images to use in the deployment
     salesrep: "lunyamwimages/boostedchatamqp"         # needs to be removed
     message-broker: "rabbitmq:3-management-alpine"    # needs to be removed
 
+  airflow-dev:
+    web: "lunyamwimages/scrapper-dev:latest"
 
   main: # not yet implemented
 

@@ -192,6 +192,7 @@ initialSetup() {
 
     if [ "$BRANCH" == "dev" ]; then
         save_docker_yaml
+        save_docker_airflow_yaml
     fi
 
     ## log in to docker 
@@ -316,9 +317,15 @@ runCertbot() {
 ## leave the lines that follow as is. It is used as a line_marker for a function which will be created here by copy_dev_docker_file.sh
 ## replace with docker function
 
+
+## replace with docker airflow function
+
 ## replace with savepullUpdatedImages
 
 ## replace with saveWatch
+
+
+## replace with certbotEntryPoint
 
 if [ ! -f "/root/watch.sh" ]; then
     createUpdateService

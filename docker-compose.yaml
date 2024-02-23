@@ -69,9 +69,12 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
       - web-root:/usr/share/nginx/html
+      - ./certbot-entrypoint.sh:/certbot-entrypoint.sh  # Mounting the script
+    entrypoint: ["/bin/sh", "-c"]
     depends_on:
       - client
-    command: certonly --webroot --webroot-path=/usr/share/nginx/html --email tomek@boostedchat.com --agree-tos --no-eff-email --force-renewal -d ${DOMAIN2}.boostedchat.com -d api.${DOMAIN2}.boostedchat.com -d airflow.${DOMAIN2}.boostedchat.com -d scrapper.${DOMAIN2}.boostedchat.com -d promptemplate.${DOMAIN2}.boostedchat.com
+    # command: certonly --webroot --webroot-path=/usr/share/nginx/html --email tomek@boostedchat.com --agree-tos --no-eff-email --force-renewal -d ${DOMAIN2}.boostedchat.com -d api.${DOMAIN2}.boostedchat.com -d airflow.${DOMAIN2}.boostedchat.com -d scrapper.${DOMAIN2}.boostedchat.com -d promptemplate.${DOMAIN2}.boostedchat.com
+    command: /certbot-entrypoint.sh
     networks:
       - booksy
 

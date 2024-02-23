@@ -54,6 +54,14 @@ serviceExists() {
     fi
 }
 
+
+copyDockerYamls() {
+    if [ "$BRANCH" == "dev" ]; then
+        save_docker_yaml
+        save_docker_airflow_yaml
+    fi
+}
+
 createService() {
     local current_dir=$(pwd)
     local script_name=$(basename "$0")
@@ -190,10 +198,11 @@ initialSetup() {
     sed -i "s/^DOMAIN2=.*/DOMAIN2=\"$hostname\"/" .env
     source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
 
-    if [ "$BRANCH" == "dev" ]; then
-        save_docker_yaml
-        save_docker_airflow_yaml
-    fi
+    # if [ "$BRANCH" == "dev" ]; then
+    #     save_docker_yaml
+    #     save_docker_airflow_yaml
+    # fi
+    copyDockerYamls
 
     ## log in to docker 
     docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
@@ -300,8 +309,10 @@ certificates_exist() {
 
 runCertbot() {
     cd /root/boostedchat-site
+    saveCertbotEntry
+    sed -i "s/jamel/$hostname/g" certbot-entrypoint.sh
 
-    if ! certificates_exist; then 
+    # if ! certificates_exist; then 
         # check if certificate already exist
         docker compose restart certbot
         echo "Waiting for certbot to run"
@@ -310,7 +321,7 @@ runCertbot() {
         
         cp ./nginx-conf.1/nginx.conf ./nginx-conf/nginx.conf
         docker compose up --build -d --force-recreate
-    fi
+    # fi
     
 }
 
@@ -338,6 +349,7 @@ fi
 if ! serviceExists; then
     createService
 else 
+    copyDockerYamls             # just in case there are any updates
     if ! projectCreated; then
         initialSetup
     else

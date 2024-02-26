@@ -3,7 +3,9 @@ build: # images to build
     client: 
       "lunyamwimages/boostedchatui-dev:latest": "LUNYAMWIDEVS/boostedchat.git      dev" # the repo url is no longer being used, but still require a value to be supplied
     api: 
-      "lunyamwimages/boostedchatapi-dev:latest": "LUNYAMWIDEVS/boostedchat-api.git      dev"
+      "lunyamwimages/boostedchatapi-dev:latest": "LUNYAMWIDEVS/boostedchat-api.git      dev" 
+    mqtt: 
+      "lunyamwimages/boostedchatmqtt-dev:latest": "LUNYAMWIDEVS/boostedchat-mqtt.git      dev"
   main: # not yet implemented
   airflow-dev:
     web: 

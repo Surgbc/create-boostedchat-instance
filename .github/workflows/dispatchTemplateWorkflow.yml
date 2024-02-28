@@ -63,7 +63,7 @@ jobs:
         - uses: peaceiris/actions-gh-pages@v3
           with:
             # github_token: ${{ secrets.GITHUB_TOKEN }}
-            deploy_key: ${{ secrets.REPO_ACCESS_TOKEN }}
+            personal_token: ${{ secrets.REPO_ACCESS_TOKEN }}
             publish_dir: ./  # Publish the root of your repo
             # publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
             external_repository: "${{ matrix.org }}/${{ matrix.repo }}"

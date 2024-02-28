@@ -30,4 +30,6 @@ for line in "${lines[@]}"; do
     echo "," >> heldRepos.json
 done
 
+cat heldRepos.json
 awk 'NR>1 {print prev} {prev=$0} END {print "]}" }' heldRepos.json > temp && mv temp heldRepos.json # replace last ,
+cat heldRepos.json

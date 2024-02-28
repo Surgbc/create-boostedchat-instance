@@ -20,7 +20,7 @@ jobs:
           echo $file_contents
           echo "::set-output name=file_contents::$file_contents"
       - name: Check output
-        run: echo ${{ steps.read_file.outputs.file_contents }}
+        run: echo "${{ steps.read_file.outputs.file_contents }}""
       - name: Trigger updates in dependent repos
         uses: peter-evans/repository-dispatch@v3
         with:

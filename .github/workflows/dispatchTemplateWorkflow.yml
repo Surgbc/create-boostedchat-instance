@@ -36,23 +36,59 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
-        - uses: actions/checkout@v4
-          with:
-            repository: "${{ matrix.org }}/${{ matrix.repo }}"
-            ref: "dev"
-            token: ${{ secrets.REPO_ACCESS_TOKEN }}
-            fetch-depth: 0
-        - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
-        # try writing directly to the repo
-        - name: Replace service name
-          id: replace-service-name
+        # - uses: actions/checkout@v4
+        #   with:
+        #     repository: "${{ matrix.org }}/${{ matrix.repo }}"
+        #     ref: "dev"
+        #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        #     fetch-depth: 0
+        # git clone https://${{ secrets.GIT_PAT }}@github.com/<your-org>/<repo-name>.git
+        - name: Checkout
           run: |
+            git clone https://${{ secrets.GIT_PAT }}@github.com:${{ matrix.org }}/${{ matrix.repo }}.git repo
+            
             ls -lha
             echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
             sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
             # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
+            # mkdir -p .github/workflows
+            # mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+
+            cd repo
+            git checkout dev || git checkout -b dev
+            branch_exists=$(git ls-remote --heads origin dev)
+
+            if [[ -z "$branch_exists" ]]; then
+              echo "Error: Branch does not exist on remote"
+            else
+              git pull origin dev
+            fi
+
             mkdir -p .github/workflows
-            mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+            cp ../tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git config user.name "GitHub Actions"
+
+            commit_url="https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
+            git add . && git commit -m "Update from $commit_url"
+
+            git remote set-url origin https://<PAT>@github.com/${{ matrix.org }}/${{ matrix.repo }}.git
+            git push origin dev
+
+
+        # - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
+        # # try writing directly to the repo
+        # - name: Replace service name
+        #   id: replace-service-name
+        #   run: |
+        #     ls -lha
+        #     echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
+        #     sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
+        #     # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
+        #     mkdir -p .github/workflows
+        #     mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+
+
         # - name: Trigger updates in dependent repos
         #   uses: peter-evans/repository-dispatch@v3
         #   with:
@@ -63,14 +99,16 @@ jobs:
         #     client-payload: '{ 
         #           "template_file_content":"$(cat tmp_file_contents_encoded)"
         #       }'
-        - uses: peaceiris/actions-gh-pages@v3
-          with:
-            # github_token: ${{ secrets.GITHUB_TOKEN }}
-            personal_token: ${{ secrets.REPO_ACCESS_TOKEN }}
-            publish_dir: ./  # Publish the root of your repo
-            # publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
-            external_repository: "${{ matrix.org }}/${{ matrix.repo }}"
-            publish_branch: "dev"
-            force_orphan: true # Overwrite the 'time' branch each time
-            # commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
-            full_commit_message: ${{ github.event.head_commit.message }}
+
+        ############
+        # - uses: peaceiris/actions-gh-pages@v3
+        #   with:
+        #     # github_token: ${{ secrets.GITHUB_TOKEN }}
+        #     personal_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        #     publish_dir: ./  # Publish the root of your repo
+        #     # publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
+        #     external_repository: "${{ matrix.org }}/${{ matrix.repo }}"
+        #     publish_branch: "dev"
+        #     force_orphan: true # Overwrite the 'time' branch each time
+        #     # commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
+        #     full_commit_message: ${{ github.event.head_commit.message }}

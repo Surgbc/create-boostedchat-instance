@@ -1,6 +1,8 @@
 name: Push to Holding Repo
 
 # Define global variables
+# Whenever this file is updated, ensure that is is also updated in all the microservice repos
+# For now this can still be done manually
 env:
   SERVICE_NAME: "client" # change this for each service
   REPO_NAME: "create-boostedchat-instance"
@@ -74,4 +76,5 @@ jobs:
             git add . && git commit -m "Update from $commit_url"
             GIT_SSH_COMMAND="ssh -i /tmp/ssh/id_rsa -o UserKnownHostsFile=/tmp/ssh/known_hosts" git push git@github.com:${{ github.repository_owner }}/${{ env.REPO_NAME }}.git ${{ env.BRANCH }}
 
+            
             

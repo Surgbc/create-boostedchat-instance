@@ -33,7 +33,7 @@ jobs:
             echo "Branch extracted from tag: $BRANCH"
             echo "LOCAL_BRANCH=$BRANCH" >> $GITHUB_ENV
             echo "BRANCH=${{ env.SERVICE_NAME }}-$BRANCH" >> $GITHUB_ENV
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
           with:
             ref: ${{ env.LOCAL_BRANCH }}
         - name: Check if destination branch exists

@@ -47,13 +47,17 @@ jobs:
             ref: ${{ matrix.service }}-${{ matrix.branch }}
         - name: Get last update and build times
           run: |
-            lastbuildtime=$(git log -1 --format=%at origin/time 2>/dev/null || echo 0)
-            lastupdatetime=$(git log -1 --format=%at origin/${{ matrix.service }}-${{ matrix.branch }} 2>/dev/null || echo 0) 
-            echo "Last build time: $lastbuildtime, Last update time: $lastupdatetime" # Add for debugging
+            # lastbuildtime=$(git log -1 --format=%at origin/time 2>/dev/null || echo 0)
+            # lastupdatetime=$(git log -1 --format=%at origin/${{ matrix.service }}-${{ matrix.branch }} 2>/dev/null || echo 0) 
+            # echo "Last build time: $lastbuildtime, Last update time: $lastupdatetime" # Add for debugging
     
-            # Skip the rest of the steps if lastbuildtime is greater
-            if [[ $lastbuildtime -gt $lastupdatetime ]]; then
-              echo "Skipping build, time branch updated more recently" 
+            # # Skip the rest of the steps if lastbuildtime is greater
+            # if [[ $lastbuildtime -gt $lastupdatetime ]]; then
+            #   echo "Skipping build, time branch updated more recently" 
+            #   exit 0  # Successfully exit to stop the current iteration
+            # fi
+            if git log -1 --pretty=%B origin/${{ matrix.service }}-${{ matrix.branch }} | grep -q "Bot: Update built time"; then
+              echo "Skipping build, last commit message on branch was 'Bot: Update built time'"
               exit 0  # Successfully exit to stop the current iteration
             fi
         - name: Set Docker secrets based on branch
@@ -80,24 +84,37 @@ jobs:
             lastUpdateTime=$(git log -1 --format=%at origin/$branch 2>/dev/null || echo 0)
             docker build -t ${{ matrix.image }} .
             docker push ${{ matrix.image }}
-    write_timestamp:
-      needs: [setup, loop] 
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3 
-        - name: Write current time to time branch
+        - name: Update build time # this just ensures that the branch new time branch always has a change
           run: |
             echo "$(date)" > time.txt  
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git config user.name "GitHub Actions"
             git add time.txt
-            git commit -m "Update time"
+            git commit -m "Bot: Update built time"
         - uses: peaceiris/actions-gh-pages@v3
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: ./  # Publish the root of your repo
-            destination_branch: time 
+            publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
             force_orphan: true # Overwrite the 'time' branch each time
+    # write_timestamp:
+    #   needs: [setup, loop] 
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #     - uses: actions/checkout@v3 
+    #     - name: Write current time to time branch # this just ensures that the branch new time branch always has a change
+    #       run: |
+    #         echo "$(date)" > time.txt  
+    #         git config user.email "github-actions[bot]@users.noreply.github.com"
+    #         git config user.name "GitHub Actions"
+    #         git add time.txt
+    #         git commit -m "Update time"
+    #     - uses: peaceiris/actions-gh-pages@v3
+    #       with:
+    #         github_token: ${{ secrets.GITHUB_TOKEN }}
+    #         publish_dir: ./  # Publish the root of your repo
+    #         publish_branch: time 
+    #         force_orphan: true # Overwrite the 'time' branch each time
     updates:
       needs: 
         - loop

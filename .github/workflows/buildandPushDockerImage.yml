@@ -87,16 +87,17 @@ jobs:
         - name: Update build time # this just ensures that the branch new time branch always has a change
           run: |
             echo "$(date)" > time.txt  
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git config user.name "GitHub Actions"
-            git add time.txt
-            git commit -m "Bot: Update built time"
+            # git config user.email "github-actions[bot]@users.noreply.github.com"
+            # git config user.name "GitHub Actions"
+            # git add time.txt
+            # git commit -m "Bot: Update built time"
         - uses: peaceiris/actions-gh-pages@v3
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: ./  # Publish the root of your repo
             publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
             force_orphan: true # Overwrite the 'time' branch each time
+            commit_message: "Bot: Update built time"
     # write_timestamp:
     #   needs: [setup, loop] 
     #   runs-on: ubuntu-latest

@@ -10,12 +10,16 @@ jobs:
   trigger_updates:
     runs-on: ubuntu-latest
     steps:
+      - name: Read file contents
+        id: read_file
+        run: |
+          file_contents=$(cat deploymentWorkflowTemplate.yml)
+          echo "::set-output name=file_contents::$file_contents"
       - name: Trigger updates in dependent repos
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: LUNYAMWIDEVS/dispatchTesting  # Replace with actual repo names
-          event-type: update-deployment-workflow  
-        #   repository: org-name/repo-name2
-        #   event: update-deployment-workflow  
-          # ... add more dependent repos as needed
+          event-type: update-deployment-workflow 
+        #   client-payload: # I want to send the contents of the file here  
+          client-payload: ${{ steps.read_file.outputs.file_contents }}

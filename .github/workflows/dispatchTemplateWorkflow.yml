@@ -15,7 +15,7 @@ jobs:
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: LUNYAMWIDEVS/dispatchTesting  # Replace with actual repo names
-          event: update-deployment-workflow  
+          event-type: update-deployment-workflow  
         #   repository: org-name/repo-name2
         #   event: update-deployment-workflow  
           # ... add more dependent repos as needed

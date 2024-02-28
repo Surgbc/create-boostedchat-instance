@@ -26,7 +26,7 @@ for line in "${lines[@]}"; do
 
     # Print the organization name and repository name
     echo "Organization: $org, Repository: $repo"
-    echo "{\"org\":\"$org\",\"repo\",\"$repo\"}"
+    echo "{\"org\":\"$org\",\"repo\":\"$repo\"}"
     echo "," >> heldRepos.json
 done
 

@@ -46,6 +46,7 @@ jobs:
           with:
             ref: ${{ matrix.service }}-${{ matrix.branch }}
         - name: Get last update and build times
+          id: check_commit_message
           run: |
             # lastbuildtime=$(git log -1 --format=%at origin/time 2>/dev/null || echo 0)
             # lastupdatetime=$(git log -1 --format=%at origin/${{ matrix.service }}-${{ matrix.branch }} 2>/dev/null || echo 0) 
@@ -58,26 +59,32 @@ jobs:
             # fi
             if git log -1 --pretty=%B origin/${{ matrix.service }}-${{ matrix.branch }} | grep -q "Bot: Update built time"; then
               echo "Skipping build, last commit message on branch was 'Bot: Update built time'"
-              exit 0  # Successfully exit to stop the current iteration
+              echo "::set-output name=skip_build::true"
+              # exit 0  # Successfully exit to stop the current iteration
+            else 
+              echo "Proceeding with build"
+              echo "::set-output name=skip_build::false"
             fi
         - name: Set Docker secrets based on branch
-          if: ${{ needs.setup.outputs.branch }} == 'dev'
+          if: ${{ needs.setup.outputs.branch }} == 'dev' && steps.check_commit_message.outputs.skip_build != 'true'
           run: |
             echo "DOCKER_USERNAME=${{ secrets.DEV_DOCKER_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.DEV_DOCKER_PASSWORD }}" >> $GITHUB_ENV
         
         - name: Set Docker secrets based on branch
-          if: ${{ needs.setup.outputs.branch }} == 'main'
+          if: ${{ needs.setup.outputs.branch }} == 'main' && steps.check_commit_message.outputs.skip_build != 'true'
           run: |
             echo "DOCKER_USERNAME=${{ secrets.MAIN_DOCKER_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.MAIN_DOCKER_PASSWORD }}" >> $GITHUB_ENV
   
         - name: Login to Docker Hub
+          if: steps.check_commit_message.outputs.skip_build != 'true'
           uses: docker/login-action@v2
           with:
             username: ${{ env.DOCKER_USERNAME }}
             password: ${{ env.DOCKER_PASSWORD }}
         - name: Build and push Docker image
+          if: steps.check_commit_message.outputs.skip_build != 'true'
           run: |
             branch="${{ matrix.service }}-${{ matrix.branch }}"
             lastBuildTime=$(git log -1 --format=%at origin/time 2>/dev/null || echo 0)
@@ -85,6 +92,7 @@ jobs:
             docker build -t ${{ matrix.image }} .
             docker push ${{ matrix.image }}
         - name: Update build time # this just ensures that the branch new time branch always has a change
+          if: steps.check_commit_message.outputs.skip_build != 'true'
           run: |
             echo "$(date)" > time.txt  
             # git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -92,6 +100,7 @@ jobs:
             # git add time.txt
             # git commit -m "Bot: Update built time"
         - uses: peaceiris/actions-gh-pages@v3
+          if: steps.check_commit_message.outputs.skip_build != 'true' 
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: ./  # Publish the root of your repo

@@ -45,7 +45,7 @@ jobs:
         # git clone https://${{ secrets.GIT_PAT }}@github.com/<your-org>/<repo-name>.git
         - name: Checkout
           run: |
-            git clone https://${{ secrets.GIT_PAT }}@github.com:${{ matrix.org }}/${{ matrix.repo }}.git repo
+            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com:${{ matrix.org }}/${{ matrix.repo }}.git repo
             
             ls -lha
             echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
@@ -72,7 +72,7 @@ jobs:
             commit_url="https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
             git add . && git commit -m "Update from $commit_url"
 
-            git remote set-url origin https://<PAT>@github.com/${{ matrix.org }}/${{ matrix.repo }}.git
+            git remote set-url origin https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ matrix.org }}/${{ matrix.repo }}.git
             git push origin dev
 
 

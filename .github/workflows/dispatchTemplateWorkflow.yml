@@ -17,7 +17,7 @@ jobs:
           file_contents=$(cat deploymentWorkflowTemplate.yml | base64)
           # file_contents=${file_contents//$'\n'/\\n}
           file_contents=${file_contents//$'\n'/<br>}
-          # echo $file_contents
+          echo $file_contents
           echo "::set-output name=file_contents::$file_contents"
       - name: Check output
         run: echo ${{ steps.read_file.outputs.file_contents }}

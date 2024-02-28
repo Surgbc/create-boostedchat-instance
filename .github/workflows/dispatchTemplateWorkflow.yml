@@ -36,6 +36,11 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
+        - uses: actions/checkout@v4
+          with:
+            repository: "${{ matrix.org }}/${{ matrix.repo }}"
+            ref: "dev"
+            token: ${{ secrets.REPO_ACCESS_TOKEN }}
         - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
         # try writing directly to the repo
         - name: Replace service name
@@ -43,14 +48,24 @@ jobs:
           run: |
             echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
             sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
-            cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
-        - name: Trigger updates in dependent repos
-          uses: peter-evans/repository-dispatch@v3
+            # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
+            mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+        # - name: Trigger updates in dependent repos
+        #   uses: peter-evans/repository-dispatch@v3
+        #   with:
+        #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        #     repository: "${{ matrix.org }}/${{ matrix.repo }}"
+        #     event-type: update-deployment-workflow 
+        #   #   client-payload: # I want to send the contents of the file here  
+        #     client-payload: '{ 
+        #           "template_file_content":"$(cat tmp_file_contents_encoded)"
+        #       }'
+        - uses: peaceiris/actions-gh-pages@v3
           with:
-            token: ${{ secrets.REPO_ACCESS_TOKEN }}
-            repository: "${{ matrix.org }}/${{ matrix.repo }}"
-            event-type: update-deployment-workflow 
-          #   client-payload: # I want to send the contents of the file here  
-            client-payload: '{ 
-                  "template_file_content":"$(cat tmp_file_contents_encoded)"
-              }'
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./  # Publish the root of your repo
+            # publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
+            external_repository: "${{ matrix.org }}/${{ matrix.repo }}"
+            publish_branch: "dev"
+            force_orphan: true # Overwrite the 'time' branch each time
+            commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"

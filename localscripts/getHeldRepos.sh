@@ -1,5 +1,39 @@
 #!/bin/bash
 
+yaml_file="images.yaml"
+
+get_service_name() {
+    local repo_url="$1.git"
+    
+    # Ensure the YAML file exists
+    if [ ! -f "$yaml_file" ]; then
+        echo "Error: YAML file '$yaml_file' not found."
+        return 1
+    fi
+    sed -i 's/#.*//g' "$yaml_file" # remove comments
+    sed -i 's/^[[:blank:]]*//' "$yaml_file"
+    sed -i 's/[[:blank:]]*$//' "$yaml_file"
+    # Delete all blank lines
+    sed -i '/^[[:space:]]*$/d' "$yaml_file"
+
+    # Put each service section in its own line
+    # Replace all newlines that occur after : and any number of trailing whitespaces
+    sed -i ':a; $!N; /^\s*[^:]*: *$/{N;ba}; s/\(:\)\s*\n/\1/g' "$yaml_file"
+
+    # Get the service name
+    # local service_name=$(grep "$repo_url" "$yaml_file" | sed -E 's/^[[:blank:]]*([^:]+):.*$/\1/')
+    local service_name=$(grep "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
+    # Check if service name is empty
+    if [ -z "$service_name" ]; then
+        echo "Error: Failed to retrieve service name for repository URL '$repo_url'."
+        return 1
+    fi
+
+    # Print the service name
+    echo "$service_name"
+    return 0
+}
+
 # Read the file contents into an array
 pwd
 mapfile -t lines < ./heldrepos.md
@@ -25,8 +59,9 @@ for line in "${lines[@]}"; do
     IFS='/' read -r org repo <<< "$org_repo"
 
     # Print the organization name and repository name
-    echo "Organization: $org, Repository: $repo"
-    echo "{\"org\":\"$org\",\"repo\":\"$repo\"}" >> heldRepos.json
+    serviceName=$(get_service_name  "$org/$repo")
+    echo "Organization: $org, Repository: $repo,\"service\":\"$serviceName\""
+    echo "{\"org\":\"$org\",\"repo\":\"$repo\",\"service\":\"$serviceName\"}" >> heldRepos.json
     echo "," >> heldRepos.json
 done
 

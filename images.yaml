@@ -1,7 +1,7 @@
 build: # images to build
   dev:
     client: 
-      "lunyamwimages/boostedchatui-dev:latest": "LUNYAMWIDEVS/boostedchat.git      dev" # the repo url is no longer being used, but still require a value to be supplied
+      "lunyamwimages/boostedchatui-dev:latest": "LUNYAMWIDEVS/boostedchat.git      dev" # the repo url is use to get service name of repo given in heldRepos.md
     api: 
       "lunyamwimages/boostedchatapi-dev:latest": "LUNYAMWIDEVS/boostedchat-api.git      dev" 
     mqtt: 
@@ -10,6 +10,8 @@ build: # images to build
   airflow-dev:
     web: 
       "lunyamwimages/scrapper-dev:latest": "LUNYAMWIDEVS/boostedchat-scrapper.git      dev"
+
+
 
 use: # images to use in the deployment. This section is not yet used. 
   dev:

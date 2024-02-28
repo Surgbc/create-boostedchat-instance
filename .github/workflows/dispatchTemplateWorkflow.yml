@@ -49,6 +49,7 @@ jobs:
             echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
             sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
             # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
+            mkdir -p .github/workflows
             mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
         # - name: Trigger updates in dependent repos
         #   uses: peter-evans/repository-dispatch@v3

@@ -42,6 +42,20 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
+        - uses: actions/checkout@v3
+          with:
+            ref: ${{ matrix.service }}-${{ matrix.branch }}
+        - name: Get last update and build times
+          run: |
+            lastbuildtime=$(git log -1 --format=%at origin/time 2>/dev/null || echo 0)
+            lastupdatetime=$(git log -1 --format=%at origin/${{ matrix.service }}-${{ matrix.branch }} 2>/dev/null || echo 0) 
+            echo "Last build time: $lastbuildtime, Last update time: $lastupdatetime" # Add for debugging
+    
+            # Skip the rest of the steps if lastbuildtime is greater
+            if [[ $lastbuildtime -gt $lastupdatetime ]]; then
+              echo "Skipping build, time branch updated more recently" 
+              exit 0  # Successfully exit to stop the current iteration
+            fi
         - name: Set Docker secrets based on branch
           if: ${{ needs.setup.outputs.branch }} == 'dev'
           run: |
@@ -59,24 +73,23 @@ jobs:
           with:
             username: ${{ env.DOCKER_USERNAME }}
             password: ${{ env.DOCKER_PASSWORD }}
-  
-        - uses: actions/checkout@v3
-          with:
-            ref: ${{ matrix.service }}-${{ matrix.branch }} 
         - name: Build and push Docker image
           run: |
+            branch="${{ matrix.service }}-${{ matrix.branch }}"
+            lastBuildTime=$(git log -1 --format=%at origin/time 2>/dev/null || echo 0)
+            lastUpdateTime=$(git log -1 --format=%at origin/$branch 2>/dev/null || echo 0)
             docker build -t ${{ matrix.image }} .
             docker push ${{ matrix.image }}
     write_timestamp:
       needs: [setup, loop] 
-      strategy:
-        matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3 
         - name: Write current time to time branch
           run: |
             echo "$(date)" > time.txt  
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git config user.name "GitHub Actions"
             git add time.txt
             git commit -m "Update time"
         - uses: peaceiris/actions-gh-pages@v3

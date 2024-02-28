@@ -7,27 +7,43 @@ on:
       - deploymentWorkflowTemplate.yml
 
 jobs:
-  trigger_updates:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      file_contents: ${{ steps.read_file.outputs.file_contents }}
     steps:
       - uses: actions/checkout@v4
       - name: Read file contents
         id: read_file
         run: |
           file_contents=$(cat deploymentWorkflowTemplate.yml | base64 -w 0) # w  option specifies the maximum line length in characters for the output lines. Setting it to 0 effectively disables line wrapping
-          # file_contents=${file_contents//$'\n'/\\n}
-          # file_contents=${file_contents//$'\n'/<br>}
           echo $file_contents
-          echo "::set-output name=file_contents::$file_contents"
-      - name: Check output
-        run: echo "${{ steps.read_file.outputs.file_contents }}"
-      - name: Trigger updates in dependent repos
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: LUNYAMWIDEVS/dispatchTesting  # Replace with actual repo names
-          event-type: update-deployment-workflow 
-        #   client-payload: # I want to send the contents of the file here  
-          client-payload: '{ 
-                "template_file_content":"${{ steps.read_file.outputs.file_contents }}"
-            }'
+          # echo "::set-output name=file_contents::$file_contents"
+          echo "$file_contents" >> $GITHUB_OUTPUT
+      - name: Get held repos list
+        id: set-matrix
+        run: |
+          ./localscripts/getHeldRepos.sh 
+          echo "matrix=$(jq -c . < ./heldRepos.json)" >> $GITHUB_OUTPUT
+      # - name: Check output
+      #   id: "file-contents"
+      #   run: echo "${{ steps.read_file.outputs.file_contents }}"
+  loop:
+      runs-on: ubuntu-latest
+      needs: 
+        - setup
+      strategy:
+        matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+      steps:
+        - run: echo "${{ matrix.org }}-${{ matrix.repo }}"
+        - name: Trigger updates in dependent repos
+          uses: peter-evans/repository-dispatch@v3
+          with:
+            token: ${{ secrets.REPO_ACCESS_TOKEN }}
+            repository: "${{ matrix.org }}-${{ matrix.repo }}"
+            event-type: update-deployment-workflow 
+          #   client-payload: # I want to send the contents of the file here  
+            client-payload: '{ 
+                  "template_file_content":"${{ needs.setup.outputs.file_contents }}"
+              }'

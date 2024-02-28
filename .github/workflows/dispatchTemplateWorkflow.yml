@@ -15,9 +15,10 @@ jobs:
         id: read_file
         run: |
           file_contents=$(cat deploymentWorkflowTemplate.yml)
+          file_contents=$(base64 $file_contents) 
           echo "::set-output name=file_contents::$file_contents"
       - name: Trigger updates in dependent repos
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: LUNYAMWIDEVS/dispatchTesting  # Replace with actual repo names

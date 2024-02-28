@@ -1,5 +1,7 @@
 name: Docker Build and Push
 
+# We need to log the last time a successful build was performed so that we work only with repos that were updated after the logged time.
+
 on:
   push:
     branches:
@@ -65,6 +67,24 @@ jobs:
           run: |
             docker build -t ${{ matrix.image }} .
             docker push ${{ matrix.image }}
+    write_timestamp:
+      needs: [setup, loop] 
+      strategy:
+        matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3 
+        - name: Write current time to time branch
+          run: |
+            echo "$(date)" > time.txt  
+            git add time.txt
+            git commit -m "Update time"
+        - uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./  # Publish the root of your repo
+            destination_branch: time 
+            force_orphan: true # Overwrite the 'time' branch each time
     updates:
       needs: 
         - loop
@@ -107,6 +127,7 @@ jobs:
             done <<< "$(gcloud compute instances list --format="value(name,zone)")"
 
             /bin/bash tmp.sh
+    
             
             
             

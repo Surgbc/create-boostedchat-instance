@@ -41,6 +41,7 @@ jobs:
             repository: "${{ matrix.org }}/${{ matrix.repo }}"
             ref: "dev"
             token: ${{ secrets.REPO_ACCESS_TOKEN }}
+            fetch-depth: 0
         - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
         # try writing directly to the repo
         - name: Replace service name

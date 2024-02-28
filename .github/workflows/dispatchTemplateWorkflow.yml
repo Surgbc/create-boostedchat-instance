@@ -24,5 +24,5 @@ jobs:
           event-type: update-deployment-workflow 
         #   client-payload: # I want to send the contents of the file here  
           client-payload: '{ 
-                "template_file_content":${{ steps.read_file.outputs.file_contents }}
+                "template_file_content":"${{ steps.read_file.outputs.file_contents }}"
             }'

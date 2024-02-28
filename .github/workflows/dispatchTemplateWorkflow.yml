@@ -23,4 +23,6 @@ jobs:
           repository: LUNYAMWIDEVS/dispatchTesting  # Replace with actual repo names
           event-type: update-deployment-workflow 
         #   client-payload: # I want to send the contents of the file here  
-          client-payload: ${{ steps.read_file.outputs.file_contents }}
+          client-payload: '{ 
+                "template_file_content":${{ steps.read_file.outputs.file_contents }}
+            }'

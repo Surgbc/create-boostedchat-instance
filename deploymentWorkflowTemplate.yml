@@ -75,9 +75,4 @@ jobs:
             commit_url="https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
             git add . && git commit -m "Update from $commit_url"
             GIT_SSH_COMMAND="ssh -i /tmp/ssh/id_rsa -o UserKnownHostsFile=/tmp/ssh/known_hosts" git push git@github.com:${{ github.repository_owner }}/${{ env.REPO_NAME }}.git ${{ env.BRANCH }}
-
-            
-
-
-
             

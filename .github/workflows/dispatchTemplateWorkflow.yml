@@ -18,7 +18,7 @@ jobs:
         id: read_file
         run: |
           file_contents=$(cat deploymentWorkflowTemplate.yml | base64 -w 0) # w  option specifies the maximum line length in characters for the output lines. Setting it to 0 effectively disables line wrapping
-          echo $file_contents
+          echo "$file_contents"
           # echo "::set-output name=file_contents::$file_contents"
           echo "$file_contents" >> $GITHUB_OUTPUT
       - name: Get held repos list

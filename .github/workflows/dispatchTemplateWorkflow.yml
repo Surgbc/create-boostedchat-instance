@@ -69,4 +69,5 @@ jobs:
             external_repository: "${{ matrix.org }}/${{ matrix.repo }}"
             publish_branch: "dev"
             force_orphan: true # Overwrite the 'time' branch each time
-            commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
+            # commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
+            full_commit_message: ${{ github.event.head_commit.message }}

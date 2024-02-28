@@ -14,7 +14,7 @@ jobs:
       - name: Read file contents
         id: read_file
         run: |
-          file_contents=$(cat deploymentWorkflowTemplate.yml | base64)
+          file_contents=$(cat deploymentWorkflowTemplate.yml | base64 -w 0) # w  option specifies the maximum line length in characters for the output lines. Setting it to 0 effectively disables line wrapping
           # file_contents=${file_contents//$'\n'/\\n}
           # file_contents=${file_contents//$'\n'/<br>}
           echo $file_contents

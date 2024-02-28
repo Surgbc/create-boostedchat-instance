@@ -69,12 +69,14 @@ jobs:
         - name: Set Docker secrets based on branch
           if: ${{ needs.setup.outputs.branch }} == 'dev' && steps.check_commit_message.outputs.skip_build != 'true'
           run: |
+            echo ${{ needs.setup.outputs.branch }}
             echo "DOCKER_USERNAME=${{ secrets.DEV_DOCKER_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.DEV_DOCKER_PASSWORD }}" >> $GITHUB_ENV
         
         - name: Set Docker secrets based on branch
           if: ${{ needs.setup.outputs.branch }} == 'main' && steps.check_commit_message.outputs.skip_build != 'true'
           run: |
+            echo ${{ needs.setup.outputs.branch }}
             echo "DOCKER_USERNAME=${{ secrets.MAIN_DOCKER_USERNAME }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.MAIN_DOCKER_PASSWORD }}" >> $GITHUB_ENV
   

@@ -36,12 +36,12 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
-        - run: echo "${{ matrix.org }}-${{ matrix.repo }}"
+        - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
         - name: Trigger updates in dependent repos
           uses: peter-evans/repository-dispatch@v3
           with:
             token: ${{ secrets.REPO_ACCESS_TOKEN }}
-            repository: "${{ matrix.org }}-${{ matrix.repo }}"
+            repository: "${{ matrix.org }}/${{ matrix.repo }}"
             event-type: update-deployment-workflow 
           #   client-payload: # I want to send the contents of the file here  
             client-payload: '{ 

@@ -26,10 +26,8 @@ for line in "${lines[@]}"; do
 
     # Print the organization name and repository name
     echo "Organization: $org, Repository: $repo"
-    echo "{\"org\":\"$org\",\"repo\":\"$repo\"}"
+    echo "{\"org\":\"$org\",\"repo\":\"$repo\"}" >> heldRepos.json
     echo "," >> heldRepos.json
 done
 
-cat heldRepos.json
 awk 'NR>1 {print prev} {prev=$0} END {print "]}" }' heldRepos.json > temp && mv temp heldRepos.json # replace last ,
-cat heldRepos.json

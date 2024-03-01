@@ -7,3 +7,4 @@
 [ -f /etc/letsencrypt/live/scrapper.jamel.boostedchat.com/privkey.pem ] || certbot certonly --webroot --webroot-path=/usr/share/nginx/html --email tomek@boostedchat.com --agree-tos --no-eff-email --force-renewal -d scrapper.jamel.boostedchat.com
 [ -f /etc/letsencrypt/live/promptemplate.jamel.boostedchat.com/privkey.pem ] || certbot certonly --webroot --webroot-path=/usr/share/nginx/html --email tomek@boostedchat.com --agree-tos --no-eff-email --force-renewal -d promptemplate.jamel.boostedchat.com
 
+## comments

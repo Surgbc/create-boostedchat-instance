@@ -1,11 +1,15 @@
-name: Docker Build and Push
+name: Docker Build and Push for Dev BAC
 
 # We need to log the last time a successful build was performed so that we work only with repos that were updated after the logged time.
 
+# on:
+#   push:
+#     branches:
+#     - master
 on:
   push:
     branches:
-    - master
+      - '*-dev.bac'
 jobs:
     setup:
       name: "Set up"
@@ -15,7 +19,7 @@ jobs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
         branch: ${{ steps.extract_branch_name.outputs.branch }}
       steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
         - name: Get branch name from commit message
           id: extract_branch_name
           run: |
@@ -28,7 +32,7 @@ jobs:
           env:
             branch: ${{ steps.extract_branch_name.outputs.branch }}
           run: |
-            /bin/bash matrix.sh
+            /bin/bash localscripts/matrix.sh
         - name: Set matrix data
           id: set-matrix
           run: |
@@ -42,7 +46,7 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
           with:
             ref: ${{ matrix.service }}-${{ matrix.branch }}
         - name: Get last update and build times
@@ -112,24 +116,6 @@ jobs:
             publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
             force_orphan: true # Overwrite the 'time' branch each time
             commit_message: "Bot: Update built time"
-    # write_timestamp:
-    #   needs: [setup, loop] 
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - uses: actions/checkout@v3 
-    #     - name: Write current time to time branch # this just ensures that the branch new time branch always has a change
-    #       run: |
-    #         echo "$(date)" > time.txt  
-    #         git config user.email "github-actions[bot]@users.noreply.github.com"
-    #         git config user.name "GitHub Actions"
-    #         git add time.txt
-    #         git commit -m "Update time"
-    #     - uses: peaceiris/actions-gh-pages@v3
-    #       with:
-    #         github_token: ${{ secrets.GITHUB_TOKEN }}
-    #         publish_dir: ./  # Publish the root of your repo
-    #         publish_branch: time 
-    #         force_orphan: true # Overwrite the 'time' branch each time
     updates:
       needs: 
         - loop

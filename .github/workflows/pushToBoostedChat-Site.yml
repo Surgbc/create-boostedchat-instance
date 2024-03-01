@@ -4,10 +4,17 @@ name: Push to BoostedChat-Site
 env:
   REPO_NAME: "boostedchat-site"
 
+# on:
+#   push:
+#     tags:
+#       - "v*"
 on:
+  workflow_dispatch:  # Manual trigger for testing
   push:
-    tags:
-      - "v*"
+    branches:
+      - master
+    paths: # on changes to scripts
+      - 'setupscripts/**'
 permissions:
   contents: write
 
@@ -17,20 +24,23 @@ jobs:
     name: "Push to BoostedChat-Site"
     runs-on: "ubuntu-latest"
     steps: 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       ## clone it first,,,, test with a differnt repo...
       - name: Clone boostedchat-site
         run: | # use the dev branch
-            ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git -b dev'
+            # ssh-agent sh -c 'echo "${{ secrets.SSH_DEPLOY_KEY }}" | ssh-add - && git clone git@github.com:LUNYAMWIDEVS/$REPO_NAME.git -b dev'
+            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b dev
+            cd  setupscripts/
             chmod +x copy_dev_docker_file.sh
             ./copy_dev_docker_file.sh 
-            cp setupvm.sh ./$REPO_NAME/install.sh
+            cd ..
+            cp ./setupscripts/setupvm.sh ./$REPO_NAME/install.sh
       - name: Push back to repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
             # DEPLOY_TOKEN: ${{ secrets[format('DEPLOY_TOKEN_{0}', github.repository_owner)] }}
-            # API_TOKEN_GITHUB: ${{ secrets[format('DEPLOY_TOKEN_{0}', github.repository_owner)] }}
-            SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+            API_TOKEN_GITHUB: ${{ secrets.REPO_ACCESS_TOKEN }}
+            # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
             # SOURCE_DIR: "./$REPO_NAME"
         with:
             source-directory: ${{ env.REPO_NAME }}

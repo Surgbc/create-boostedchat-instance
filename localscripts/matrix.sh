@@ -5,17 +5,17 @@ sections=("$branch" "airflow-$branch")
 echo "Branch:$branch"
 echo  '{"include": [' > config.json
 
-
-services=$(cat images.yaml | yq eval ".build.$branch | keys | .[]")
+images_file="configs/images.yaml"
+services=$(cat "$images_file" | yq eval ".build.$branch | keys | .[]")
 
 for section in "${sections[@]}"; do
-    services=$(cat images.yaml | yq eval ".build.$section | keys | .[]")
+    services=$(cat "$images_file" | yq eval ".build.$section | keys | .[]")
 
     for service in $services; do
-        whole_value=$(yq eval ".build.$section.$service" images.yaml)
-        image_name=$(yq eval ".build.$section.$service | keys | .[]" "images.yaml")
+        whole_value=$(yq eval ".build.$section.$service" "$images_file")
+        image_name=$(yq eval ".build.$section.$service | keys | .[]" "$images_file")
         # Get the repository for the current service
-        repository=$(yq eval ".build.$section.$service" images.yaml)
+        repository=$(yq eval ".build.$section.$service" "$images_file")
 
         # Extract the repository name from the value
         repository=$(echo "$repository" | cut -d':' -f2)

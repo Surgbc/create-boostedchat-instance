@@ -24,3 +24,5 @@ while true; do
     inotifywait -e modify "$file_to_watch"
     on_file_change
 done
+
+# changed something on watch...

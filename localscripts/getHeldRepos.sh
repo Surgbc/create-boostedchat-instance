@@ -1,6 +1,7 @@
 #!/bin/bash
 
-yaml_file="images.yaml"
+yaml_file="configs/images.yaml"
+owner=$1
 
 get_service_name() {
     local repo_url="$1.git"
@@ -36,6 +37,10 @@ get_service_name() {
 
 # Read the file contents into an array
 pwd
+# remove organization from urls
+sed -i 's/\[[^\/]*/[ORG/' heldrepos.md 
+sort -u heldrepos.md > /tmp/heldrepos.md
+mv /tmp/heldrepos.md heldrepos.md
 mapfile -t lines < ./heldrepos.md
 
 echo  '{"include": [' > heldRepos.json
@@ -61,7 +66,7 @@ for line in "${lines[@]}"; do
     # Print the organization name and repository name
     serviceName=$(get_service_name  "$org/$repo")
     echo "Organization: $org, Repository: $repo,\"service\":\"$serviceName\""
-    echo "{\"org\":\"$org\",\"repo\":\"$repo\",\"service\":\"$serviceName\"}" >> heldRepos.json
+    echo "{\"org\":\"$owner\",\"repo\":\"$repo\",\"service\":\"$serviceName\"}" >> heldRepos.json
     echo "," >> heldRepos.json
 done
 

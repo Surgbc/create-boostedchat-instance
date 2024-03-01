@@ -1,114 +1,192 @@
 name: Trigger Dependent Repo Updates
 
+# only triggered on master branch of main repo (not fork)
 on:
   workflow_dispatch:  # Manual trigger for testing
   push:
-    paths:
-      - deploymentWorkflowTemplate.yml
+    branches:
+      - master
+    paths: # on workflowTemplates directory change
+      - 'workflowTemplates/**'
+      - 'deploymentTemplates/**'
+      - 'configs/**'
+      # - 'deploymentTemplates/**' # these are not sent to microservice repos
+      - 'heldrepos.md'
 
 jobs:
+  check_if_fork:
+    outputs:
+      matrix: ${{ steps.check_fork.outputs.is_fork }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if fork # this one is not working for now. And we would not like to hardcode the main repo
+      # therefore: it should run on all master branches (even on forks)
+      # if: ${{ github.event.pull_request.head.repo.full_name != 'LUNYAMWIDEVS/{repo}' }}
+      # if: github.event.pull_request.head.repo.full_name == github.repository # Generic but works also for forks
+        id: check_fork
+        run: |
+          echo $GITHUB_REPOSITORY
+          echo $GITHUB_ACTOR
+          if [ "$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)" != "$(echo $GITHUB_ACTOR)" ]; then
+            # echo "::set-output name=is_fork::true"
+            echo "is_fork=true" >> $GITHUB_OUTPUT
+          else
+            # echo "::set-output name=is_fork::false"
+            echo "is_fork=false" >> $GITHUB_OUTPUT
+          fi
   setup:
+    # needs: check_if_fork
+    # if: ${{ needs.check_if_fork.outputs.is_fork == 'false' }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       file_contents: ${{ steps.read_file.outputs.file_contents }}
     steps:
       - uses: actions/checkout@v4
-      - name: Read file contents
-        id: read_file
-        run: |
-          file_contents=$(cat deploymentWorkflowTemplate.yml | base64 -w 0) # w  option specifies the maximum line length in characters for the output lines. Setting it to 0 effectively disables line wrapping
-          echo "$file_contents"
-          echo "::set-output name=file_contents::$file_contents"
-          # echo "$file_contents" >> $GITHUB_OUTPUT
+      # - name: Read file contents
+      #   id: read_file
+      #   run: |
+      #     file_contents=$(cat deploymentWorkflowTemplate.yml | base64 -w 0) # w  option specifies the maximum line length in characters for the output lines. Setting it to 0 effectively disables line wrapping
+      #     echo "$file_contents"
+      #     echo "::set-output name=file_contents::$file_contents"
+      #     # echo "$file_contents" >> $GITHUB_OUTPUT
       - name: Get held repos list
         id: set-matrix
         run: |
-          ./localscripts/getHeldRepos.sh 
+          ./localscripts/getHeldRepos.sh ${{ github.repository_owner }}
           echo "matrix=$(jq -c . < ./heldRepos.json)" >> $GITHUB_OUTPUT
       # - name: Check output
       #   id: "file-contents"
       #   run: echo "${{ steps.read_file.outputs.file_contents }}"
   loop:
-      runs-on: ubuntu-latest
-      needs: 
-        - setup
-      strategy:
-        matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
-      steps:
-        # - uses: actions/checkout@v4
-        #   with:
-        #     repository: "${{ matrix.org }}/${{ matrix.repo }}"
-        #     ref: "dev"
-        #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        #     fetch-depth: 0
-        # git clone https://${{ secrets.GIT_PAT }}@github.com/<your-org>/<repo-name>.git
-        - name: Checkout
-          run: |
-            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ matrix.org }}/${{ matrix.repo }}.git repo
-            
-            ls -lha
-            echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
-            sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
-            # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
-            # mkdir -p .github/workflows
-            # mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+    runs-on: ubuntu-latest
+    needs: 
+      - setup
+      - check_if_fork
+    # if: ${{ needs.check_if_fork.outputs.is_fork == 'false' }}
+    strategy:
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+    steps:
+      # - uses: actions/checkout@v4
+      #   with:
+      #     repository: "${{ matrix.org }}/${{ matrix.repo }}"
+      #     ref: "dev"
+      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      #     fetch-depth: 0
+      # git clone https://${{ secrets.GIT_PAT }}@github.com/<your-org>/<repo-name>.git
+      
+      # add step to clone current directory into /tmp/current using secrets.REPO_ACCESS_TOKEN
+      - uses: gliech/create-github-secret-action@v1
+        with:
+          location: ${{ matrix.org }}/${{ matrix.repo }}
+          name: REPO_ACCESS_TOKEN
+          value: ${{ secrets.REPO_ACCESS_TOKEN }}
+          org_visibility: private
+          pa_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      - name: Clone current directory
+        uses: actions/checkout@v4
+        # with: 
+        #   path: current
+      # - name: Read file contents
+      #   id: read_file
+      #   run: |
+      #     cd /tmp/current
+      #     file_contents=$(cat deploymentWorkflowTemplate.yml | base64 -w 0) # w  option specifies the maximum line length in characters for the output lines. Setting it to 0 effectively disables line wrapping
+      #     echo "$file_contents"
+      #     echo "::set-output name=file_contents::$file_contents"
+      #     # echo "$file_contents" >> $GITHUB_OUTPUT
+      #     echo "$file_contents" > file_contents
 
-            cd repo
-            git checkout dev || git checkout -b dev
-            branch_exists=$(git ls-remote --heads origin dev)
+      - name: Checkout
+        run: |
+          git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ matrix.org }}/${{ matrix.repo }}.git repo
+          
+          ls -lha
+          # echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
+          # cat /tmp/current/workflowTemplates/deploymentWorkflowTemplate.yml | base64 -d > tmp_file_contents
+          # sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
+          
+          # directory="/tmp/current/workflowTemplates/"
+          directory="./workflowTemplates/"
+          serviceName="${{ matrix.service }}"
 
-            if [[ -z "$branch_exists" ]]; then
-              echo "Error: Branch does not exist on remote"
-            else
-              git pull origin dev
-            fi
+          for file in "$directory"/*; do
+            sed -i "s/SERVICE_NAME: \"\$serviceName\"/SERVICE_NAME: \"$serviceName\"/g" "$file"
+          done
 
-            mkdir -p .github/workflows
-            cp ../tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git config user.name "GitHub Actions"
+          # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
+          # mkdir -p .github/workflows
+          # rsync -av /tmp/current/workflowTemplates/ .github/workflows/
+          
+          # mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
 
+          cd repo
+          git checkout dev || git checkout -b dev
+          branch_exists=$(git ls-remote --heads origin dev)
+
+          if [[ -z "$branch_exists" ]]; then
+            echo "Error: Branch does not exist on remote"
+          else
+            git pull origin dev
+          fi
+
+          # mkdir -p ./repo/.github/workflows/
+          mkdir -p .github/workflows/
+          rsync -av ../workflowTemplates/ .github/workflows/
+
+          # mkdir -p .github/workflows
+          # cp ../tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "GitHub Actions"
+
+
+          if [[ -z "$(git status -s)" ]]; then
+              echo "No changes detected."
+          else
+              echo "Changes detected."
+              
             commit_url="https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
             git add . && git commit -m "Update from $commit_url"
 
             git remote set-url origin https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ matrix.org }}/${{ matrix.repo }}.git
             git push origin dev
+          
+          fi
 
 
-        # - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
-        # # try writing directly to the repo
-        # - name: Replace service name
-        #   id: replace-service-name
-        #   run: |
-        #     ls -lha
-        #     echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
-        #     sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
-        #     # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
-        #     mkdir -p .github/workflows
-        #     mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
+      # - run: echo "${{ matrix.org }}/${{ matrix.repo }}"
+      # # try writing directly to the repo
+      # - name: Replace service name
+      #   id: replace-service-name
+      #   run: |
+      #     ls -lha
+      #     echo "${{ needs.setup.outputs.file_contents }}" | base64 -d > tmp_file_contents
+      #     sed -i 's/SERVICE_NAME: "\$serviceName"/SERVICE_NAME: "${{ matrix.service }}"/g' tmp_file_contents
+      #     # cat tmp_file_contents | base64 -w 0 > tmp_file_contents_encoded
+      #     mkdir -p .github/workflows
+      #     mv tmp_file_contents .github/workflows/pushToHoldingRepo.yaml
 
 
-        # - name: Trigger updates in dependent repos
-        #   uses: peter-evans/repository-dispatch@v3
-        #   with:
-        #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        #     repository: "${{ matrix.org }}/${{ matrix.repo }}"
-        #     event-type: update-deployment-workflow 
-        #   #   client-payload: # I want to send the contents of the file here  
-        #     client-payload: '{ 
-        #           "template_file_content":"$(cat tmp_file_contents_encoded)"
-        #       }'
+      # - name: Trigger updates in dependent repos
+      #   uses: peter-evans/repository-dispatch@v3
+      #   with:
+      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      #     repository: "${{ matrix.org }}/${{ matrix.repo }}"
+      #     event-type: update-deployment-workflow 
+      #   #   client-payload: # I want to send the contents of the file here  
+      #     client-payload: '{ 
+      #           "template_file_content":"$(cat tmp_file_contents_encoded)"
+      #       }'
 
-        ############
-        # - uses: peaceiris/actions-gh-pages@v3
-        #   with:
-        #     # github_token: ${{ secrets.GITHUB_TOKEN }}
-        #     personal_token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        #     publish_dir: ./  # Publish the root of your repo
-        #     # publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
-        #     external_repository: "${{ matrix.org }}/${{ matrix.repo }}"
-        #     publish_branch: "dev"
-        #     force_orphan: true # Overwrite the 'time' branch each time
-        #     # commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
-        #     full_commit_message: ${{ github.event.head_commit.message }}
+      ############
+      # - uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     # github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     personal_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      #     publish_dir: ./  # Publish the root of your repo
+      #     # publish_branch: "${{ matrix.service }}-${{ matrix.branch }}"
+      #     external_repository: "${{ matrix.org }}/${{ matrix.repo }}"
+      #     publish_branch: "dev"
+      #     force_orphan: true # Overwrite the 'time' branch each time
+      #     # commit_message: "Update pushToHoldingRepo from https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/commit/${{ github.sha }}"
+      #     full_commit_message: ${{ github.event.head_commit.message }}

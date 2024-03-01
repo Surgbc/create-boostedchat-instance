@@ -5,7 +5,7 @@ build: # images to build
     api: 
       "lunyamwimages/boostedchatapi-dev:latest": "LUNYAMWIDEVS/boostedchat-api.git      dev" 
     mqtt: 
-      "lunyamwimages/boostedchatmqtt-dev:latest": "LUNYAMWIDEVS/boostedchat-mqtt.git      dev"
+      "lunyamwimages/boostedchatmqtt-dev:latest": "boostedchat/boostedchat-mqtt.git      dev"
   main: # not yet implemented
   airflow-dev:
     web: 

@@ -1,5 +1,111 @@
 # create-gcloud-vm
 
+CI/CD Pipeline is implemented here.
+
+
+
+
+```mermaid
+
+flowchart TB
+
+classDef borderless stroke-width:0px
+classDef darkBlue fill:#00008B, color:#fff
+classDef brightBlue fill:#6082B6, color:#fff
+classDef gray fill:#62524F, color:#fff
+classDef gray2 fill:#4F625B, color:#fff
+classDef red fill:#f00, color:#fff
+classDef green fill:#111, color:#fff
+classDef yellow fill:#fcba03, color:#fff
+
+subgraph Clone[Clone]
+    main_clone
+    dev_clone
+end
+
+class Clone green
+
+
+subgraph Fork[Fork]
+    main_fork
+    dev_fork
+end
+class Fork yellow
+
+subgraph docker[Docker]
+    main_docker
+    dev_docker
+end
+
+class docker red
+
+subgraph boostedChatGithub[boostedChatGithub]
+  subgraph microService[microService]
+      main_microService
+      dev_microService
+  end
+
+  subgraph holdingRepo[holdingRepo]
+      master_holdingRepo
+      dev_holdingRepo
+      dev_holdingBranch
+      main_holdingBranch
+      dev_holdingRepo--PR-->master_holdingRepo
+  end
+
+  subgraph b-site[b-site]
+    main_b-site
+    dev_b-site
+  end
+end
+
+class boostedChatGithub brightBlue
+
+subgraph GCP[GCP]
+    subgraph Production[Production]
+      booksy
+      jamel
+      ...n
+  end
+  GCP_dev
+end
+
+class GCP gray2
+
+dev_clone<--push, pull-->dev_fork
+dev_fork<--PR, sync-->dev_microService
+
+master_holdingRepo-. workflows .->dev_microService
+master_holdingRepo-. workflows .->main_microService
+dev_microService--PR-->main_microService
+dev_microService--push-->dev_holdingBranch-->dev_docker
+main_microService--push-->main_holdingBranch-->main_docker
+
+dev_holdingBranch--scripts-->dev_b-site
+dev_b-site--PR-->main_b-site
+
+main_holdingBranch--Signal-->Production
+main_docker--pull-->Production
+main_b-site--pull-->Production
+
+dev_holdingBranch--setup/signal-->GCP_dev
+dev_docker--pull-->GCP_dev
+dev_b-site--clone-->GCP_dev
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 Work flow to create new instance of boostedchat. This is just meant to test the script, the main set-up is to be done in the core-api.
 
 ## Table of Contents

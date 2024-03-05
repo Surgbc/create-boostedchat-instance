@@ -1,0 +1,117 @@
+name: Triggered to Update Servers
+
+on:
+  repository_dispatch:
+    types: [updates]
+env:
+  dev_vm_name: boostedchat-dev
+jobs:
+  gcp_login:
+    runs-on: ubuntu-latest
+    outputs:
+        credentialsFile: ${{steps.credentials_file.outpus.credentials_file}}
+    steps:
+      - name: Login to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+
+      - name: set credential_file
+        id: credentials_file
+        run: |
+          credentials=$(cat ${{steps.auth.outputs.credentials_file_path}}  | base64 -w 0)
+          cat $credentials
+          echo "credentials_file=$credentials" >> $GITHUB_OUTPUT
+          # gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}} // wew want to save this so that we log in only once
+      
+  dev_mv_exists:
+    needs: gcp_login
+    runs-on: ubuntu-latest
+    if: ${{ github.event.client_payload.branch }} == 'dev'
+    outputs:
+      vm_exists: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+      - run: |
+          echo ${{ needs.gcp_login.outputs.credentialsFile}}
+          echo ${{ needs.gcp_login.outputs.credentialsFile}} | base64 -d > gcp_credentials
+      - name: List vms
+        id: list-instances
+        run: |  
+          gcloud compute instances list --format="value(name)" > instances.txt
+          # instances=$(cat instances.txt | base64 - 0)
+          # echo "instances=$instances" >> $GITHUB_OUTPUT
+      - name: Create Vm if not exists
+        id: vm_exists
+        run: |
+          cat $instances
+          if grep -q "${{env.dev_vm_name}}" instances.txt; then
+            echo "VM exists"
+            echo "vm_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "VM does not exist"
+            echo "vm_exists=false" >> $GITHUB_OUTPUT
+            ## trigger vm creation
+            # exit 1  # Indicate failure if VM does not exist
+          fi
+    #   - name: List vms
+    #     id: list-instances-again
+    #     run: |  
+    #       gcloud compute instances list --format="value(name)"
+
+    #   - name: Create Vm
+    #     if: steps.vm_exists.outputs.vm_exists != 'true'
+    #     run: |
+    #       gcloud compute instances create ${{ env.dev_vm_name }} \
+    #         --machine-type=n2-standard-2 \
+    #         --zone=us-central1-a \
+    #         --image=ubuntu-2204-jammy-v20240207a \
+    #         --image-project=ubuntu-os-cloud \
+    #         --boot-disk-size=25GB \
+    #         --boot-disk-type=pd-standard \
+    #         --tags=http-server,https-server
+    #   - name: Get VM IP
+    #     if: steps.vm_exists.outputs.vm_exists != 'true'
+    #     id: get_vm_ip
+    #     run: |
+    #           VM_IP=$(gcloud compute instances describe "${{ env.dev_vm_name }}" \
+    #                       --zone=us-central1-a \
+    #                       --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+    #           # echo "::set-output name=vm_ip::$VM_IP"
+    #           echo "vm_ip=$VM_IP" >> $GITHUB_OUTPUT
+        
+    #   - name: Create DNS Record
+    #     if: steps.vm_exists.outputs.vm_exists != 'true'
+    #     env:
+    #       IP: ${{ steps.get_vm_ip.outputs.vm_ip }}
+    #       SUBDOMAIN: ${{ env.dev_vm_name }}
+    #       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    #       CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+    #     run: |
+    #       ./createSubdomains.sh ## requires checkout
+    #   - name: Copy privateKey to VM
+    #     if: steps.vm_exists.outputs.vm_exists != 'true'
+    #     run: |
+    #       gcloud compute scp ./privateKey root@${{ env.dev_vm_name }}:~/privateKey --zone=us-central1-a
+    #   - name: Copy env template file
+    #     run: |
+    #       gcloud compute ssh root@${{ env.dev_vm_name }} --zone=us-central1-a --command "mkdir -p /etc/boostedchat/ && exit"
+    #       gcloud compute scp ./.env.example root@${{ env.dev_vm_name }}:/etc/boostedchat/.env --zone=us-central1-a
+    #   - name: Configure Git to Use Private Key
+    #     run: |
+    #       gcloud compute ssh root@${{ env.dev_vm_name }} --zone=us-central1-a --command="mkdir -p ~/.ssh && cp ~/privateKey ~/.ssh/id_rsa_git && chmod 600 ~/.ssh/id_rsa_git"
+    #   - name: Copy SSH script to VM
+    #     run: |
+    #       gcloud compute scp ./setupvm.sh root@${{ env.dev_vm_name }}:~/setupvm.sh --zone=us-central1-a
+    #   - name: Set execute permission on the script
+    #     run: |
+    #       gcloud compute ssh root@${{ env.dev_vm_name }} --zone=us-central1-a --command="chmod +x ~/setupvm.sh"
+    #   - name: Run the script on the VM
+    #     run: |
+    #       gcloud compute ssh root@${{ env.dev_vm_name }} --zone=us-central1-a --command="~/setupvm.sh dev"

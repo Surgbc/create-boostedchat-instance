@@ -1,0 +1,100 @@
+name: Triggered to Update Servers
+
+on:
+  repository_dispatch:
+    types: [updates]
+env:
+  dev_vm_name: boostedchat-dev
+jobs:
+  gcp_login:
+    runs-on: ubuntu-latest
+    outputs:
+        credentialsFile: ${{steps.credentials_file.outpus.credentials_file}}
+    steps:
+      - name: Login to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+
+      - name: set credential_file
+        id: credentials_file
+        run: |
+          credentials=$(cat ${{steps.auth.outputs.credentials_file_path}}  | base64 -w 0)
+          cat $credentials
+          echo "credentials_file=$credentials" >> $GITHUB_OUTPUT
+          # gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}} // wew want to save this so that we log in only once
+      
+  dev_mv_exists:
+    runs-on: ubuntu-latest
+    needs: 
+      - gcp_login
+    if: ${{ github.event.client_payload.branch }} == 'dev'
+    outputs:
+      vm_exists: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+      - run: |
+          echo ${{ needs.gcp_login.outputs.credentialsFile}}
+          echo ${{ needs.gcp_login.outputs.credentialsFile}} | base64 -d > gcp_credentials
+          gcloud auth login --cred-file=gcp_credentials
+      - name: List vms
+        id: list-instances
+        run: |  
+
+          gcloud compute instances list --format="value(name)" > instances.txt
+          # instances=$(cat instances.txt | base64 - 0)
+          # echo "instances=$instances" >> $GITHUB_OUTPUT
+      - name: Create Vm if not exists
+        id: vm_exists
+        run: |
+          cat $instances
+          if grep -q "${{env.dev_vm_name}}" instances.txt; then
+            echo "VM exists"
+            echo "vm_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "VM does not exist"
+            echo "vm_exists=false" >> $GITHUB_OUTPUT
+            # exit 1  # Indicate failure if VM does not exist
+          fi
+      - name: Trigger VM Creation
+        if: steps.vm_exists.outputs.vm_exists != 'true'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: "${{ github.repository }}"
+          event-type: create-vm
+          client-payload: '{ 
+                "vm_name":"${{ env.dev_vm_name }}",
+                "next": "updates"
+            }'
+      - name: Trigger VM Creation
+        if: steps.vm_exists.outputs.vm_exists != 'true'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: "${{ github.repository }}"
+          event-type: update-vm
+          client-payload: '{ 
+                "vm_name":"${{ env.dev_vm_name }}"
+            }'
+  update_existing:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.client_payload.branch }} != 'dev'
+    steps:
+      - name: Trigger VM Update
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: "${{ github.repository }}"
+          event-type: update-vm
+          client-payload: '{ 
+                "vm_name":"${{ github.event.client_payload.vm_name }}"
+            }'
+
+  

@@ -199,12 +199,40 @@ initialSetup() {
     sed -i "s/__HOSTNAME__/$hostname/g" .env
     
 
-    random_string1=$(openssl rand -out /dev/stdout 32 | base64 -w 0)
-    random_string2=$(openssl rand -out /dev/stdout 32 | base64 -w 0)
-    random_string3=$(openssl rand -out /dev/stdout 32 | base64 -w 0)
-    sed -i "s/__GENERIC_STR1__/$random_string1/g" .env
-    sed -i "s/__GENERIC_STR2__/$random_string2/g" .env
-    sed -i "s/__GENERIC_STR3__/$random_string3/g" .env
+    # random_string1=$(openssl rand -out /dev/stdout 32 | base64 -w 0)
+    # random_string2=$(openssl rand -out /dev/stdout 32 | base64 -w 0)
+    # random_string3=$(openssl rand -out /dev/stdout 32 | base64 -w 0)
+
+
+    # sed -i "s/__GENERIC_STR1__/$random_string1/g" .env
+    # sed -i "s/__GENERIC_STR2__/$random_string2/g" .env
+    # sed -i "s/__GENERIC_STR3__/$random_string3/g" .env
+    generate_random_string() {
+        openssl rand -out /dev/stdout 32 | base64 -w 0
+    }
+
+    # Loop until all occurrences of __GENERIC_STR__ are replaced
+    while grep -q "__GENERIC_STR1__" .env; do
+        # Generate random string
+        random_string=$(generate_random_string)
+
+        # Replace placeholders in .env file with random string
+        sed -i "s/__GENERIC_STR1__/$random_string/g" .env
+    done
+    while grep -q "__GENERIC_STR2__" .env; do
+        # Generate random string
+        random_string=$(generate_random_string)
+
+        # Replace placeholders in .env file with random string
+        sed -i "s/__GENERIC_STR2__/$random_string/g" .env
+    done
+    while grep -q "__GENERIC_STR3__" .env; do
+        # Generate random string
+        random_string=$(generate_random_string)
+
+        # Replace placeholders in .env file with random string
+        sed -i "s/__GENERIC_STR3__/$random_string/g" .env
+    done
 
     source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
 

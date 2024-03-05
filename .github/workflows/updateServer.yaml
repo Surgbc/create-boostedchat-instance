@@ -39,6 +39,9 @@ jobs:
     # needs: 
     #   - gcp_login
     if: ${{github.event.client_payload.branch == 'dev' }}
+    permissions:
+          contents: 'read'
+          id-token: 'write'
     outputs:
       vm_exists: ${{ steps.set-matrix.outputs.matrix }}
     steps:

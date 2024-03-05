@@ -2,7 +2,7 @@ name: Triggered to Update Servers
 
 on:
   repository_dispatch:
-    types: [updates]
+    types: [create_vm]
 env:
   dev_vm_name: boostedchat-dev
 jobs:

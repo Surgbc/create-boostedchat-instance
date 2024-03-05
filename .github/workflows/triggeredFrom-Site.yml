@@ -2,7 +2,7 @@ name: React to Trigger from -Site
 
 on:
   repository_dispatch:
-    types: [updates]
+    types: [updates_old]
 
 jobs:
   deploy_to_environment:

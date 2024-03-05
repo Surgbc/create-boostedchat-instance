@@ -6,33 +6,33 @@ on:
 env:
   dev_vm_name: boostedchat-dev
 jobs:
-  gcp_login:
-    runs-on: ubuntu-latest
-    outputs:
-        credentialsFile: ${{steps.credentials_file.outputs.credentials_file}}
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v4
-      - name: Login to Google Cloud
-        id: auth
-        uses: google-github-actions/auth@v1
-        with:
-          token_format: access_token
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.3.0
+  # gcp_login:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #       credentialsFile: ${{steps.credentials_file.outputs.credentials_file}}
+  #   permissions:
+  #     contents: 'read'
+  #     id-token: 'write'
+  #   steps:
+  #     # - name: Checkout
+  #     #   uses: actions/checkout@v4
+  #     - name: Login to Google Cloud
+  #       id: auth
+  #       uses: google-github-actions/auth@v1
+  #       with:
+  #         token_format: access_token
+  #         workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
+  #         service_account: ${{ secrets.SERVICE_ACCOUNT }}
+  #     - name: Set up Cloud SDK
+  #       uses: google-github-actions/setup-gcloud@v0.3.0
 
-      - name: set credential_file
-        id: credentials_file
-        run: |
-          credentials=$(cat ${{steps.auth.outputs.credentials_file_path}}  | base64 -w 0)
-          echo $credentials
-          echo "credentials_file=$credentials" >> $GITHUB_OUTPUT
-          # gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}} // wew want to save this so that we log in only once
+  #     - name: set credential_file
+  #       id: credentials_file
+  #       run: |
+  #         credentials=$(cat ${{steps.auth.outputs.credentials_file_path}}  | base64 -w 0)
+  #         echo $credentials
+  #         echo "credentials_file=$credentials" >> $GITHUB_OUTPUT
+  #         # gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}} // wew want to save this so that we log in only once
       
   dev_mv_exists:
     runs-on: ubuntu-latest

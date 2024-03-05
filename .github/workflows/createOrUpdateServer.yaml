@@ -87,9 +87,10 @@ jobs:
           event-type: create-vm
           client-payload: '{ 
                 "vm_name":"${{ env.dev_vm_name }}",
+                "branch":"dev",
                 "next": "updates"
             }'
-      - name: Trigger VM Creation
+      - name: Trigger VM Update
         if: steps.vm_exists.outputs.vm_exists != 'true'
         uses: peter-evans/repository-dispatch@v3
         with:

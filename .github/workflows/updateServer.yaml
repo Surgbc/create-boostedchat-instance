@@ -87,6 +87,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.client_payload.branch }} != 'dev'
     steps:
+      - run: |
+          echo ${{ github.event.client_payload.branch }}
       - name: Trigger VM Update
         uses: peter-evans/repository-dispatch@v3
         with:

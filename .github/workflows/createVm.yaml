@@ -57,6 +57,7 @@ jobs:
           cp ./setupscripts/setupvm.sh ./setupvm.sh
       - name: Copy privateKey to VM
         run: |
+          echo "${{secrets.SSH_DEPLOY_KEY}}" >> ./privateKey
           gcloud compute scp ./privateKey root@${{ github.event.client_payload.vm_name }}:~/privateKey --zone=us-central1-a
       - name: Copy env template file
         run: |

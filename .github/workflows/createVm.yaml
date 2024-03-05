@@ -62,6 +62,7 @@ jobs:
       - name: Copy env template file
         run: |
           gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command "mkdir -p /etc/boostedchat/ && exit"
+          echo "${{secrets.ENV_FILE}}" >> ./.env.example
           gcloud compute scp ./.env.example root@${{ github.event.client_payload.vm_name }}:/etc/boostedchat/.env --zone=us-central1-a
       - name: Configure Git to Use Private Key
         run: |

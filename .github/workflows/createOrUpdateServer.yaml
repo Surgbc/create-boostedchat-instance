@@ -91,7 +91,7 @@ jobs:
                 "next": "updates"
             }'
       - name: Trigger VM Update
-        if: steps.vm_exists.outputs.vm_exists != 'true'
+        if: steps.vm_exists.outputs.vm_exists == 'true'
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}

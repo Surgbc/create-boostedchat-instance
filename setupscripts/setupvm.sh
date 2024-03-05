@@ -196,6 +196,13 @@ initialSetup() {
     ## echo "DOMAIN2=$hostname" >> .env
     sed -i "s/^DOMAIN1=.*/DOMAIN1=\"$hostname\"/" .env
     sed -i "s/^DOMAIN2=.*/DOMAIN2=\"$hostname\"/" .env
+    sed -i "s/__HOSTNAME__/\"$hostname\"/g" .env
+    random_string1=$(openssl rand -base64 32)
+    random_string3=$(openssl rand -base64 32)
+    random_string3=$(openssl rand -base64 32)
+    sed -i "s/__GENERIC_STR1__/\"$random_string1\"/g" .env
+    sed -i "s/__GENERIC_STR2__/\"$random_string2\"/g" .env
+    sed -i "s/__GENERIC_STR3__/\"$random_string3\"/g" .env
     source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
 
     # if [ "$BRANCH" == "dev" ]; then

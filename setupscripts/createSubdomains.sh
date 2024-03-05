@@ -27,6 +27,21 @@ for sub in "${subdomains[@]}"; do
         "proxied": false
     }'
 
+    # delete before creating new
+    DNS_RECORDS=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records?type=A&name=${sub}.boostedchat.com" \
+    -H "Authorization: $TOKEN" \
+    -H "Content-Type: application/json")
+
+    RECORD_IDS=$(echo "$DNS_RECORDS" | jq -r '.result[].id')
+
+    # Loop through record IDs and delete each record
+    for record_id in $RECORD_IDS; do
+        echo "Deleting DNS record with ID: $record_id"
+        curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records/$record_id" \
+            -H "Authorization: $TOKEN" \
+            -H "Content-Type: application/json"
+    done
+
     # Make the POST request to create the DNS record
     RESPONSE=$(curl -X POST -s -H "Authorization: ${TOKEN}" -H "Content-Type: application/json" -d "${DNS_RECORD_DATA}" "${URL}")
 

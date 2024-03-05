@@ -1,4 +1,4 @@
-name: Triggered to Update Servers
+name: Create VM
 
 on:
   repository_dispatch:

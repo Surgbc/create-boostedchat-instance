@@ -9,7 +9,7 @@ jobs:
   gcp_login:
     runs-on: ubuntu-latest
     outputs:
-        credentialsFile: ${{steps.credentials_file.outpus.credentials_file}}
+        credentialsFile: ${{steps.credentials_file.outputs.credentials_file}}
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -50,8 +50,7 @@ jobs:
           gcloud auth login --cred-file=gcp_credentials
       - name: List vms
         id: list-instances
-        run: |  
-
+        run: |
           gcloud compute instances list --format="value(name)" > instances.txt
           # instances=$(cat instances.txt | base64 - 0)
           # echo "instances=$instances" >> $GITHUB_OUTPUT

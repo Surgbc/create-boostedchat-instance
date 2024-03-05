@@ -30,7 +30,7 @@ jobs:
         id: credentials_file
         run: |
           credentials=$(cat ${{steps.auth.outputs.credentials_file_path}}  | base64 -w 0)
-          cat $credentials
+          echo $credentials
           echo "credentials_file=$credentials" >> $GITHUB_OUTPUT
           # gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}} // wew want to save this so that we log in only once
       

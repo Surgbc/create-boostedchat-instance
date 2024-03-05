@@ -57,12 +57,12 @@ jobs:
           cp ./setupscripts/setupvm.sh ./setupvm.sh
       - name: Copy privateKey to VM
         run: |
-          echo "${{secrets.SSH_DEPLOY_KEY}}" |base64 -d > ./privateKey
+          echo "${{secrets.SSH_DEPLOY_KEY}}" > ./privateKey
           gcloud compute scp ./privateKey root@${{ github.event.client_payload.vm_name }}:~/privateKey --zone=us-central1-a
       - name: Copy env template file
         run: |
           gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command "mkdir -p /etc/boostedchat/ && exit"
-          echo "${{secrets.ENV_FILE}}" >> ./.env.example
+          echo "${{secrets.ENV_FILE_BASE}}" | |base64 -d  > ./.env.example
           gcloud compute scp ./.env.example root@${{ github.event.client_payload.vm_name }}:/etc/boostedchat/.env --zone=us-central1-a
       - name: Configure Git to Use Private Key
         run: |

@@ -167,6 +167,10 @@ initialSetup() {
 
     cd boostedchat-site
 
+    saveCertbotEntry # before directory is created
+    echo "Created certbot entry point file"
+    ls -lha
+
     ## nginx-config files
     cp -r ./nginx-conf ./nginx-conf.1
     rm -rf ./nginx-conf

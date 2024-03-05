@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - gcp_login
-    if: github.event.client_payload.branch == 'dev'
+    if: ${{github.event.client_payload.branch == 'dev' }}
     outputs:
       vm_exists: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -85,7 +85,8 @@ jobs:
             }'
   update_existing:
     runs-on: ubuntu-latest
-    if: github.event.client_payload.branch != 'dev'
+    # if: github.event.client_payload.branch != 'dev'
+    if: ${{ github.event.client_payload.branch != 'dev' }}
     steps:
       - run: |
           echo ${{ github.event.client_payload.branch }}

@@ -10,9 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         credentialsFile: ${{steps.credentials_file.outpus.credentials_file}}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      # - name: Checkout
+      #   uses: actions/checkout@v4
       - name: Login to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1

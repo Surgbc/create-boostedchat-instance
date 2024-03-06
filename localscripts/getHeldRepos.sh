@@ -23,7 +23,8 @@ get_service_name() {
 
     # Get the service name
     # local service_name=$(grep "$repo_url" "$yaml_file" | sed -E 's/^[[:blank:]]*([^:]+):.*$/\1/')
-    local service_name=$(grep "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
+    # local service_name=$(grep "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
+    local service_name=$(grep -m 1 "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
     # Check if service name is empty
     if [ -z "$service_name" ]; then
         echo "Error: Failed to retrieve service name for repository URL '$repo_url'."

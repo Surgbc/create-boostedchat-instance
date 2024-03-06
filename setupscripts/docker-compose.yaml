@@ -83,7 +83,7 @@ services:
       - booksy
 
   mqtt:
-    image: lunyamwimages/boostedchatmqtt
+    image: lunyamwimages/boostedchatmqtt-dev:latest
     restart: always
     ports:
       - "1883:1883"
@@ -97,7 +97,7 @@ services:
       - booksy
 
   prompt:
-    image: lunyamwimages/promptfactory
+    image: lunyamwimages/promptfactory-dev:latest
     restart: always
     depends_on:
       - api

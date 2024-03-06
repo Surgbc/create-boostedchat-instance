@@ -8,10 +8,21 @@ build: # images to build
       "lunyamwimages/boostedchatmqtt-dev:latest": "boostedchat/boostedchat-mqtt.git      dev"
     prompt: 
       "lunyamwimages/boostedchatmqtt-dev:latest": "boostedchat/boostedchat-mqtt.git      dev"
-  main: # not yet implemented
   airflow-dev:
     web: 
       "lunyamwimages/scrapper-dev:latest": "LUNYAMWIDEVS/boostedchat-scrapper.git      dev"
+  main:
+    client: 
+      "lunyamwimages/boostedchatui:main": "LUNYAMWIDEVS/boostedchat.git      main" # the repo url is use to get service name of repo given in heldRepos.md
+    api: 
+      "lunyamwimages/boostedchatapi:main": "LUNYAMWIDEVS/boostedchat-api.git      main" 
+    mqtt: 
+      "lunyamwimages/boostedchatmqtt:main": "boostedchat/boostedchat-mqtt.git      main"
+    prompt: 
+      "lunyamwimages/boostedchatmqtt:main": "boostedchat/boostedchat-mqtt.git      main"
+  airflow-main:
+    web: 
+      "lunyamwimages/scrapper:main": "LUNYAMWIDEVS/boostedchat-scrapper.git      main"
 
 
 

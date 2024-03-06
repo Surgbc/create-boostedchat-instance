@@ -8,3 +8,8 @@ docker rmi $(docker images -aq)
 docker volume rm $(docker volume ls -q)
 
 rm -rf boostedchat-site
+
+sudo systemctl stop installboostedchat
+sudo systemctl disable installboostedchat
+sudo rm /etc/systemd/system/installboostedchat.service
+sudo systemctl daemon-reload

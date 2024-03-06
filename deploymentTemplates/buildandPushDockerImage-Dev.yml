@@ -74,8 +74,8 @@ jobs:
             lastUpdateTime=$(git log -1 --format=%at origin/$branch 2>/dev/null || echo 0)
             docker build -t ${{ matrix.image }} .
             docker push ${{ matrix.image }}
-            - name: Delete after Docker push
-        - run: |
+        - name: Delete after Docker push
+          run: |
             curl -L \
             -X DELETE \
             -H "Accept: application/vnd.github+json" \

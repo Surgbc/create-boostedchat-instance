@@ -212,7 +212,8 @@ initialSetup() {
     # sed -i "s/__GENERIC_STR2__/$random_string2/g" .env
     # sed -i "s/__GENERIC_STR3__/$random_string3/g" .env
     generate_random_string() {
-        openssl rand -out /dev/stdout 8 | base64 -w 0 | sed 's/=//g' | sed 's/[^[:alnum:]]//g'
+        length=$((RANDOM % 9 + 24))  # Generate random length between 24 and 32
+        openssl rand -out /dev/stdout "$length" | base64 -w 0 | sed 's/=//g' | sed 's/[^[:alnum:]]//g'
     }
 
     # Loop until all occurrences of __GENERIC_STR__ are replaced

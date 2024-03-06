@@ -7,7 +7,7 @@ build: # images to build
     mqtt: 
       "lunyamwimages/boostedchatmqtt-dev:latest": "LUNYAMWIDEVS/boostedchat-mqtt.git      dev"
     prompt: 
-      "lunyamwimages/boostedchatmqtt-dev:latest": "LUNYAMWIDEVS/promptemplate.git      dev"
+      "lunyamwimages/promptfactory-dev:latest": "LUNYAMWIDEVS/promptemplate.git      dev"
   airflow-dev:
     web: 
       "lunyamwimages/scrapper-dev:latest": "LUNYAMWIDEVS/boostedchat-scrapper.git      dev"
@@ -19,7 +19,7 @@ build: # images to build
     mqtt: 
       "lunyamwimages/boostedchatmqtt:main": "LUNYAMWIDEVS/boostedchat-mqtt.git      main"
     prompt: 
-      "lunyamwimages/boostedchatmqtt:main": "LUNYAMWIDEVS/promptemplate.git      main"
+      "lunyamwimages/promptfactory:main": "LUNYAMWIDEVS/promptemplate.git      main"
   airflow-main:
     web: 
       "lunyamwimages/scrapper:main": "LUNYAMWIDEVS/boostedchat-scrapper.git      main"

@@ -45,7 +45,6 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
-        // check first if the branch exists
         - uses: actions/checkout@v4
           with:
             ref: ${{ matrix.service }}-${{ matrix.branch }}

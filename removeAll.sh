@@ -13,3 +13,5 @@ sudo systemctl stop installboostedchat
 sudo systemctl disable installboostedchat
 sudo rm /etc/systemd/system/installboostedchat.service
 sudo systemctl daemon-reload
+
+rm -rf /opt/postgres-data

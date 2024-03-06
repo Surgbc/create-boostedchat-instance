@@ -26,12 +26,12 @@ get_service_name() {
     # local service_name=$(grep "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
     devLineNumber=$( sed -e 's/".*//' "$yaml_file" | grep -nE -m 1 'dev:' "$yaml_file" | sed 's/:.*//')
     # devLineNumber=$( sed -e 's/".*//' "$yaml_file" | grep -nE  'dev:' "$yaml_file" | sed 's/:.*//')
-   sed -e 's/".*//' "./configs/images.yaml"  | grep -nE  'dev:' | sed 's/:.*//'
+#    sed -e 's/".*//' "./configs/images.yaml"  | grep -nE  'dev:' | sed 's/:.*//'
     devLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'dev:' | grep -vE -m1 -- '-dev:')")" "./configs/images.yaml" | sed 's/:.*//')
     mainLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'main:' | grep -vE -m1 -- '-main:')")" "./configs/images.yaml" | sed 's/:.*//')
     airflowDevLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'airflow-dev:' | grep -vE -m1 -- '-airflow-dev:')")" "./configs/images.yaml" | sed 's/:.*//')
     airflowMainLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'airflow-main:' | grep -vE -m1 -- '-airflow-main:')")" "./configs/images.yaml" | sed 's/:.*//')
-    serviceLineNumber=$(grep -n -m 1 "$repo_url" "$yaml_file" | sed 's/:.*//')
+    serviceLineNumber=$(grep -n -m 1 "$repo_url" "./configs/images.yaml" | sed 's/:.*//')
 
     line_numbers=("$devLineNumber" "$mainLineNumber" "$airflowDevLineNumber" "$airflowMainLineNumber")
 
@@ -45,7 +45,7 @@ get_service_name() {
                     "$airflowDevLineNumber") variable="airflowDevLineNumber";;
                     "$airflowMainLineNumber") variable="airflowMainLineNumber";;
                 esac
-                echo "Match found! Variable: ${variable}"
+                # echo "Match found! Variable: ${variable}"
                 found=true
                 break
             fi
@@ -57,7 +57,7 @@ get_service_name() {
 
         ((serviceLineNumber--))
     done
-    echo "==>$variable"
+    # echo "==>$variable"
 
     if [[ $variable == airflow* ]]; then
         airflowService="airflow-"
@@ -65,7 +65,7 @@ get_service_name() {
         airflowService=""
     fi
 
-    echo "airflowService: $airflowService"
+    # echo "airflowService: $airflowService"
 
     local service_name=$(grep -m 1 "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
     # Check if service name is empty
@@ -74,7 +74,7 @@ get_service_name() {
         return 1
     fi
 
-    service_name="$$airflowService$service_name"
+    service_name="$airflowService$service_name"
     # Print the service name
     echo "$service_name"
     return 0
@@ -83,7 +83,7 @@ get_service_name() {
 # Read the file contents into an array
 pwd
 # remove organization from urls
-sed -i 's/\[[^\/]*/[ORG/' heldrepos.md 
+# sed -i 's/\[[^\/]*/[ORG/' heldrepos.md 
 sort -u heldrepos.md > /tmp/heldrepos.md
 mv /tmp/heldrepos.md heldrepos.md
 mapfile -t lines < ./heldrepos.md

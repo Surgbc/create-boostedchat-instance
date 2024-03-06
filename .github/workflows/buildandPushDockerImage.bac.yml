@@ -31,8 +31,9 @@ jobs:
         - name: Yaml to Json
           env:
             branch: ${{ steps.extract_branch_name.outputs.branch }}
+            PAT: ${{ secrets.REPO_ACCESS_TOKEN }}
           run: |
-            /bin/bash localscripts/matrix.sh
+            /bin/bash localscripts/matrix.sh ${{ github.repository }}
         - name: Set matrix data
           id: set-matrix
           run: |

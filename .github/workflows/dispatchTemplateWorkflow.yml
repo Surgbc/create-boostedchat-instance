@@ -52,6 +52,8 @@ jobs:
       #     # echo "$file_contents" >> $GITHUB_OUTPUT
       - name: Get held repos list
         id: set-matrix
+        env:
+          PAT: ${{ secrets.REPO_ACCESS_TOKEN }}
         run: |
           ./localscripts/getHeldRepos.sh ${{ github.repository_owner }}
           echo "matrix=$(jq -c . < ./heldRepos.json)" >> $GITHUB_OUTPUT

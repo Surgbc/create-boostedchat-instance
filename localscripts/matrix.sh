@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sections=("$branch" "airflow-$branch")
+fullRepo=$1
 # branch="dev"
 echo "Branch:$branch"
 echo  '{"include": [' > config.json
@@ -37,6 +38,9 @@ for section in "${sections[@]}"; do
         echo "Branch: $innerBranch"
         echo "----------------------"
         useService="$(echo $section | grep -o "^airflow\-" )$service"
+
+        repoFull="fullRepo"
+        curl -s -H "Authorization: Bearer $PAT"  -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$repoFull/branches/devs$useService-$innerBranch
         
         echo "{\"service\":\"$useService\", \"image\":\"$image_name\", \"repo\":\"$repository\", \"branch\":\"$innerBranch\"  }">> config.json
         echo "," >> config.json

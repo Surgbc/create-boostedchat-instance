@@ -27,9 +27,11 @@ jobs:
           with:
             ref: master
         - name: Yaml to Json
+          env:
+            PAT: ${{ secrets.REPO_ACCESS_TOKEN }}
           run: |
             ls -lha
-            /bin/bash localscripts/matrix.sh
+            /bin/bash localscripts/matrix.sh  ${{ github.repository }}
         - name: Set matrix data
           id: set-matrix
           run: |
@@ -43,6 +45,7 @@ jobs:
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:
+        // check first if the branch exists
         - uses: actions/checkout@v4
           with:
             ref: ${{ matrix.service }}-${{ matrix.branch }}

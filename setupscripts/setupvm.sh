@@ -262,6 +262,7 @@ initialSetup() {
     docker compose up --build -d
 
     ## Edit prompt-factory
+    sleep 10 ## seems to require some time before starting
     sed -i "s/^#port = 5432/port = 5434/" /opt/postgres-promptfactory-data/postgresql.conf
 
     docker compose restart postgres-promptfactory

@@ -24,6 +24,49 @@ get_service_name() {
     # Get the service name
     # local service_name=$(grep "$repo_url" "$yaml_file" | sed -E 's/^[[:blank:]]*([^:]+):.*$/\1/')
     # local service_name=$(grep "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
+    devLineNumber=$( sed -e 's/".*//' "$yaml_file" | grep -nE -m 1 'dev:' "$yaml_file" | sed 's/:.*//')
+    # devLineNumber=$( sed -e 's/".*//' "$yaml_file" | grep -nE  'dev:' "$yaml_file" | sed 's/:.*//')
+   sed -e 's/".*//' "./configs/images.yaml"  | grep -nE  'dev:' | sed 's/:.*//'
+    devLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'dev:' | grep -vE -m1 -- '-dev:')")" "./configs/images.yaml" | sed 's/:.*//')
+    mainLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'main:' | grep -vE -m1 -- '-main:')")" "./configs/images.yaml" | sed 's/:.*//')
+    airflowDevLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'airflow-dev:' | grep -vE -m1 -- '-airflow-dev:')")" "./configs/images.yaml" | sed 's/:.*//')
+    airflowMainLineNumber=$(grep -n -m 1 "$(echo "$(sed -e 's/".*//' "./configs/images.yaml" | grep 'airflow-main:' | grep -vE -m1 -- '-airflow-main:')")" "./configs/images.yaml" | sed 's/:.*//')
+    serviceLineNumber=$(grep -n -m 1 "$repo_url" "$yaml_file" | sed 's/:.*//')
+
+    line_numbers=("$devLineNumber" "$mainLineNumber" "$airflowDevLineNumber" "$airflowMainLineNumber")
+
+    while true; do
+        found=false
+        for num in "${line_numbers[@]}"; do
+            if [ "$num" -eq "$serviceLineNumber" ]; then
+                case $num in
+                    "$devLineNumber") variable="devLineNumber";;
+                    "$mainLineNumber") variable="mainLineNumber";;
+                    "$airflowDevLineNumber") variable="airflowDevLineNumber";;
+                    "$airflowMainLineNumber") variable="airflowMainLineNumber";;
+                esac
+                echo "Match found! Variable: ${variable}"
+                found=true
+                break
+            fi
+        done
+
+        if [ "$found" = true ]; then
+            break
+        fi
+
+        ((serviceLineNumber--))
+    done
+    echo "==>$variable"
+
+    if [[ $variable == airflow* ]]; then
+        airflowService="airflow-"
+    else
+        airflowService=""
+    fi
+
+    echo "airflowService: $airflowService"
+
     local service_name=$(grep -m 1 "$repo_url" "$yaml_file" | awk -F: '{print $(NF-3)}')
     # Check if service name is empty
     if [ -z "$service_name" ]; then
@@ -31,6 +74,7 @@ get_service_name() {
         return 1
     fi
 
+    service_name="$$airflowService$service_name"
     # Print the service name
     echo "$service_name"
     return 0

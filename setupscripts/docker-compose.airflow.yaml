@@ -63,10 +63,12 @@ services:
   postgresetl:
     image: postgres:latest
     container_name: postgres-etl-container
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: luther1996-
-      POSTGRES_DB: etl
+      POSTGRES_USER: ${POSTGRES_USERNAME_ETL}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_ETL}
+      POSTGRES_DB: ${POSTGRES_DBNAME_ETL}
     volumes:
       - /opt/postgres-etl-data:/var/lib/postgresql/data
     expose:

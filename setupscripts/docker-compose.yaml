@@ -18,6 +18,8 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres-container
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -32,6 +34,8 @@ services:
   postgres-promptfactory:
     image: postgres:latest
     container_name: postgres-promptfactory-container
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_PROMPTFACTORY_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PROMPTFACTORY_PASSWORD}

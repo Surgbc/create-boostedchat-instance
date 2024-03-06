@@ -238,7 +238,7 @@ initialSetup() {
         sed -i "s/__GENERIC_STR3__/$random_string/g" .env
     done
 
-    source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
+    # source <(sed 's/^/export /' .env )  # is this really necessary, or does docker export the variables in .env by itself?
 
     # if [ "$BRANCH" == "dev" ]; then
     #     save_docker_yaml

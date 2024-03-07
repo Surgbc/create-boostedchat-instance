@@ -19,15 +19,15 @@ jobs:
           cat .env.example |grep "EMAIL_PASSWORD=" >> tmpEnv
           cat .env.example |grep "INSTANCES_EMAIL=" >> tmpEnv
           source <(sed 's/^/export /' tmpEnv ) 
-          cat tmpEnv
-          echo $EMAIL_USER
-          echo $EMAIL_USER
-          echo $EMAIL_PASSWORD
+          # cat tmpEnv
+          # echo $EMAIL_USER
+          # echo $EMAIL_USER
+          # echo $EMAIL_PASSWORD
           sed -i "s/^root=.*/root=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthUser=.*/AuthUser=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthPass=.*/AuthPass=\"$EMAIL_PASSWORD\"/" setupscripts/ssmtp.conf
           sudo cp setupscripts/ssmtp.conf /etc/ssmtp/ssmtp.conf
-          sudo cat /etc/ssmtp/ssmtp.conf
+          # sudo cat /etc/ssmtp/ssmtp.conf
           /bin/bash setupscripts/sendEmail.sh "Creating ${{ github.event.client_payload.vm_name }}" "Step 1 of ${{ github.workflow }}"
       - name: Login to Google Cloud
         id: auth

@@ -17,6 +17,13 @@ response=$(curl -s -L \
   -H "X-GitHub-Api-Version: 2022-11-28" \
   "https://api.github.com/repos/$fullRepo/actions/workflows/$WORKFLOW_ID/runs")
 
+
+curl -s -L \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $GH_PAT" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  "https://api.github.com/repos/$fullRepo/actions/workflows/$WORKFLOW_ID/runs
+
 # Parse the response and extract the IDs of running workflow runs
 # Exclude the first running run ID
 run_ids=$(echo "$response" | jq -r '.workflow_runs[] | select(.status == "in_progress") | .id')

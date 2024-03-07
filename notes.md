@@ -5,7 +5,9 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 80e
 
 psql -h boostedchat-dev.boostedchat.com -U postgres -d -p 5432 
 
-psql -h boostedchat-dev.boostedchat.com -U postgres -d boostedchat-dev -p 5432
+psql -h devtest.boostedchat.com -U postgres -d devtest -p 5432
+psql -h devtest.boostedchat.com -U postgres -d etl -p 5433
+psql -h devtest.boostedchat.com -U postgres -d promptfactory -p 5434
 
 
 docker compose exec -it postgres psql -U postgres -d boostedchat-dev

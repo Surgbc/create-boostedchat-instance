@@ -15,3 +15,5 @@ sudo rm /etc/systemd/system/installboostedchat.service
 sudo systemctl daemon-reload
 
 rm -rf /opt/postgres-data
+rm -rf /opt/postgres-etl-data
+rm -rf /opt/postgres-etl-data

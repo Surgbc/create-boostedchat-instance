@@ -276,7 +276,10 @@ initialSetup() {
     docker ps -a --filter "status=exited" --filter "exited=1" --format "{{.ID}} {{.Image}}" | while read -r container_id image_name; do echo ""; echo ""; echo ""; echo ""; echo ""; echo ""; echo "Container ID: $container_id, Image Name: $image_name"; docker logs "$container_id"; done
     sleep 60
     # where will we read the 
-    docker compose exec -e "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" api python manage.py createsuperuser --email="$DJANGO_SUPERUSER_EMAIL"  --noinput
+    ## for some reason one accepts --username while the other complains of missing --username
+    docker compose exec -e "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" api python manage.py createsuperuser --email="$DJANGO_SUPERUSER_EMAIL"  --noinput --username "$DJANGO_SUPERUSER_EMAIL" ||     docker compose exec -e "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" api python manage.py createsuperuser --email="$DJANGO_SUPERUSER_EMAIL"  --noinput
+
+    docker compose exec -e "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" prompt python manage.py createsuperuser --email="$DJANGO_SUPERUSER_EMAIL"  --noinput --username "$DJANGO_SUPERUSER_EMAIL" || docker compose exec -e "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" prompt python manage.py createsuperuser --email="$DJANGO_SUPERUSER_EMAIL"  --noinput
 }
 
 projectCreated() {
@@ -394,22 +397,27 @@ if [ ! -f "/root/pullUpdatedImages.sh" ]; then
 fi
 
 if ! serviceExists; then
+    ./sendEmail.sh "Creating $hostname" "Creating install service"
     createService
 else 
     copyDockerYamls             # just in case there are any updates
     if ! projectCreated; then
+        ./sendEmail.sh "Creating $hostname" "Running initial setup"
         initialSetup
     else
         if subdomainSet; then
+            ./sendEmail.sh "Creating $hostname" "Running certbot"
             runCertbot
             stopAndRemoveService
         else
             while ! subdomainSet; do
+                ./sendEmail.sh "Creating $hostname" "Waiting for subdomain propagation"
                 echo "Checking again in 60 seconds"
                 sleep 60  # Wait for 60 seconds before checking again
             done
             runCertbot
             stopAndRemoveService
+            ./sendEmail.sh "Done creating $hostname" "Instance is ready!"
         fi
     fi
 fi

@@ -20,6 +20,9 @@ jobs:
           cat .env.example |grep "INSTANCES_EMAIL=" >> tmpEnv
           source <(sed 's/^/export /' tmpEnv | grep ) 
           cat tmpEnv
+          echo $EMAIL_USER
+          echo $EMAIL_USER
+          echo $EMAIL_PASSWORD
           sed -i "s/^root=.*/root=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthUser=.*/AuthUser=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthPass=.*/AuthPass=\"$EMAIL_PASSWORD\"/" setupscripts/ssmtp.conf

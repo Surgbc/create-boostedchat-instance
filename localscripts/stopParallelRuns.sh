@@ -15,7 +15,9 @@ response=$(curl -s -H "Accept: application/vnd.github.v3+json" \
   -H "Authorization: Bearer $GH_PAT" \
   "https://api.github.com/repos/$fullRepo/actions/workflows")
 
-WORKFLOW_ID=$(echo "$response" | jq -r '.workflows[] | select(.name == "$workflowNamev") | .id')
+WORKFLOW_ID=$(echo "$response" | jq -r '.workflows[] | select(.name == "$workflowName") | .id')
+
+echo $WORKFLOW_ID
 
 curl -s -L \
   -H "Accept: application/vnd.github+json" \

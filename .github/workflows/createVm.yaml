@@ -18,7 +18,7 @@ jobs:
           cat .env.example |grep "EMAIL_USER=" > tmpEnv
           cat .env.example |grep "EMAIL_PASSWORD=" >> tmpEnv
           cat .env.example |grep "INSTANCES_EMAIL=" >> tmpEnv
-          source <(sed 's/^/export /' tmpEnv | grep ) 
+          source <(sed 's/^/export /' tmpEnv ) 
           cat tmpEnv
           echo $EMAIL_USER
           echo $EMAIL_USER

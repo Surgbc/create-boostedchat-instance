@@ -15,14 +15,16 @@ jobs:
       - run: |
           sudo apt-get install ssmtp -y
           echo "${{secrets.ENV_FILE_BASE64}}" | base64 -d  > ./.env.example
-          cat .env.example |grep "EMAIL_USER" > tmpEnv
+          cat .env.example |grep "EMAIL_USER=" > tmpEnv
           cat .env.example |grep "EMAIL_PASSWORD" >> tmpEnv
           cat .env.example |grep "INSTANCES_EMAIL" >> tmpEnv
           source <(sed 's/^/export /' tmpEnv | grep ) 
+          cat tmpEnv
           sed -i "s/^root=.*/root=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthUser=.*/AuthUser=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthPass=.*/AuthPass=\"$EMAIL_PASSWORD\"/" setupscripts/ssmtp.conf
           sudo cp setupscripts/ssmtp.conf /etc/ssmtp/ssmtp.conf
+          cat /etc/ssmtp/ssmtp.conf
           /bin/bash setupscripts/sendEmail.sh "Creating ${{ github.event.client_payload.vm_name }}" "Step 1 of ${{ github.workflow }}"
       - name: Login to Google Cloud
         id: auth

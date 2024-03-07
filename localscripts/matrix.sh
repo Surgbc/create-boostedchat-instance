@@ -39,19 +39,18 @@ for section in "${sections[@]}"; do
         echo "----------------------"
         useService="$(echo $section | grep -o "^airflow\-" )$service"
 
-        repoFull="fullRepo"
         # curl -s -H "Authorization: Bearer $PAT"  -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$repoFull/branches/devs$useService-$innerBranch
         
-        curl -H "Authorization: Bearer $PAT" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$repoFull/branches/devs$useService-$innerBranch"
+        curl -H "Authorization: Bearer $PAT" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$fullRepo/branches/devs$useService-$innerBranch"
 
-        response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $PAT" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$repoFull/branches/devs$useService-$innerBranch")
+        response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $PAT" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/$fullRepo/branches/devs$useService-$innerBranch")
         if [ $response -eq 200 ]; then
             # Branch exists, proceed with adding data to config.json
             echo "{\"service\":\"$useService\", \"image\":\"$image_name\", \"repo\":\"$repository\", \"branch\":\"$innerBranch\"  }" >> config.json
             echo "," >> config.json
         else
             # Branch does not exist, skipping
-            echo "Branch $repoFull:$useService-$innerBranch does not exist. Skipping..."
+            echo "Branch $fullRepo:$useService-$innerBranch does not exist. Skipping..."
         fi
 
         # echo "{\"service\":\"$useService\", \"image\":\"$image_name\", \"repo\":\"$repository\", \"branch\":\"$innerBranch\"  }" >> config.json

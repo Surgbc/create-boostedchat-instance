@@ -27,8 +27,8 @@ jobs:
           run: |
             /bin/bash localscripts/stopParallelRuns.sh ${{ github.repository }}
 
-    setup: stopParallelJobs
-      needs: 
+    setup: 
+      needs: stopParallelJobs
       name: "Set up"
       # if: startsWith(github.event.head_commit.message, 'build and deploy')
       # if: ${{ startsWith(github.ref, 'refs/heads/') && github.ref_type == 'branch' && github.ref == 'refs/heads/*-dev' }}

@@ -19,7 +19,9 @@ echo $response
 
 echo "Checking for workflow with name: $workflowName"
 
-WORKFLOW_ID=$(echo "$response" | jq -r '.workflows[] | select(.name == "$workflowName") | .id')
+# WORKFLOW_ID=$(echo "$response" | jq -r '.workflows[] | select(.name == "$workflowName") | .id')
+WORKFLOW_ID=$(echo "$response" | jq -r --arg workflowName "$workflowName" '.workflows[] | select(.name == $workflowName)  | .id')
+
 
 echo $WORKFLOW_ID
 

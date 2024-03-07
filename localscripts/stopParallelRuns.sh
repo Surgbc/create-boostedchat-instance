@@ -7,13 +7,17 @@ echo $fullRepo
 
 echo "curl -s -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: Bearer $GH_PAT\"  \"https://api.github.com/repos/$fullRepo/actions/workflows\""
 
-curl -s -H "Accept: application/vnd.github.v3+json" \
-  -H "Authorization: Bearer $GH_PAT" \
-  "https://api.github.com/repos/$fullRepo/actions/workflows"
+# curl -s -H "Accept: application/vnd.github.v3+json" \
+#   -H "Authorization: Bearer $GH_PAT" \
+#   "https://api.github.com/repos/$fullRepo/actions/workflows"
 
 response=$(curl -s -H "Accept: application/vnd.github.v3+json" \
   -H "Authorization: Bearer $GH_PAT" \
   "https://api.github.com/repos/$fullRepo/actions/workflows")
+
+echo $response
+
+echo "Checking for workflow with name: $workflowName"
 
 WORKFLOW_ID=$(echo "$response" | jq -r '.workflows[] | select(.name == "$workflowName") | .id')
 

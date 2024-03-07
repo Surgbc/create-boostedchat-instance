@@ -396,6 +396,8 @@ if [ ! -f "/root/pullUpdatedImages.sh" ]; then
     savePullUpdatedImages
 fi
 
+source <(sed 's/^/export /' /etc/boostedchat/.env ) >/dev/null 
+
 if ! serviceExists; then
     ./sendEmail.sh "Creating $hostname" "Creating install service"
     createService

@@ -274,6 +274,9 @@ initialSetup() {
 
     ## Check logs of containers that have exited
     docker ps -a --filter "status=exited" --filter "exited=1" --format "{{.ID}} {{.Image}}" | while read -r container_id image_name; do echo ""; echo ""; echo ""; echo ""; echo ""; echo ""; echo "Container ID: $container_id, Image Name: $image_name"; docker logs "$container_id"; done
+    sleep 60
+    # where will we read the 
+    docker compose exec -e "DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD" api python manage.py createsuperuser --email="$DJANGO_SUPERUSER_EMAIL"  --noinput
 }
 
 projectCreated() {

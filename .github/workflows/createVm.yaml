@@ -63,6 +63,9 @@ jobs:
         run: |
           gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command "mkdir -p /etc/boostedchat/ && exit"
           echo "${{secrets.ENV_FILE_BASE64}}" | base64 -d  > ./.env.example
+          echo "" >> ./.env.example
+          echo "DJANGO_SUPERUSER_PASSWORD=${{ github.event.client_payload.password }}" >> ./.env.example
+          echo "DJANGO_SUPERUSER_EMAIL=${{ github.event.client_payload.email }}" >> ./.env.example
           gcloud compute scp ./.env.example root@${{ github.event.client_payload.vm_name }}:/etc/boostedchat/.env --zone=us-central1-a
       - name: Configure Git to Use Private Key
         run: |

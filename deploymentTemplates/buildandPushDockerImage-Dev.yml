@@ -14,7 +14,21 @@ on:
       - '*-dev'
 
 jobs:
-    setup:
+    stopParallelJobs:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            ref: master
+        - name: stopParallelJobs
+          env:
+            workflowName: ${{ github.workflow }}
+            GH_PAT: ${{ secrets.REPO_ACCESS_TOKEN }}
+          run: |
+            /bin/bash localscripts/stopParallelRuns.sh ${{ github.repository }}
+
+    setup: stopParallelJobs
+      needs: 
       name: "Set up"
       # if: startsWith(github.event.head_commit.message, 'build and deploy')
       # if: ${{ startsWith(github.ref, 'refs/heads/') && github.ref_type == 'branch' && github.ref == 'refs/heads/*-dev' }}

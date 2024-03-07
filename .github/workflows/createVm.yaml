@@ -23,7 +23,7 @@ jobs:
           # echo $EMAIL_USER
           # echo $EMAIL_USER
           # echo $EMAIL_PASSWORD
-          sed -i "s/^root=.*/root=$EMAIL_USER/" setupscripts/ssmtp.conf
+          sed -i "s/^root=.*/root=CI-CD/" setupscripts/ssmtp.conf
           sed -i "s/^AuthUser=.*/AuthUser=$EMAIL_USER/" setupscripts/ssmtp.conf
           sed -i "s/^AuthPass=.*/AuthPass=$EMAIL_PASSWORD/" setupscripts/ssmtp.conf
           sudo cp setupscripts/ssmtp.conf /etc/ssmtp/ssmtp.conf
@@ -77,7 +77,7 @@ jobs:
           echo "${{secrets.SSH_DEPLOY_KEY}}" > ./privateKey
           gcloud compute scp ./privateKey root@${{ github.event.client_payload.vm_name }}:~/privateKey --zone=us-central1-a
           ## install smtp
-          gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command="sudo apt-get install ssmtp -y"
+          gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command="sudo apt get update && sudo apt-get install ssmtp -y"
           ## copy sendmail files
           gcloud compute scp ./setupscripts/ssmtp.conf root@${{ github.event.client_payload.vm_name }}:/etc/ssmtp/ssmtp.conf --zone=us-central1-a
           gcloud compute scp ./setupscripts/sendEmail.sh root@${{ github.event.client_payload.vm_name }}:~/sendEmail.sh --zone=us-central1-a

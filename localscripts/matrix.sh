@@ -9,6 +9,8 @@ echo  '{"include": [' > config.json
 images_file="configs/images.yaml"
 services=$(cat "$images_file" | yq eval ".build.$branch | keys | .[]")
 
+echo "false" > hasMatrix
+
 for section in "${sections[@]}"; do
     services=$(cat "$images_file" | yq eval ".build.$section | keys | .[]")
 
@@ -48,6 +50,7 @@ for section in "${sections[@]}"; do
             # Branch exists, proceed with adding data to config.json
             echo "{\"service\":\"$useService\", \"image\":\"$image_name\", \"repo\":\"$repository\", \"branch\":\"$innerBranch\"  }" >> config.json
             echo "," >> config.json
+            echo "true" > hasMatrix
         else
             # Branch does not exist, skipping
             echo "Branch $fullRepo:$useService-$innerBranch does not exist. Skipping..."

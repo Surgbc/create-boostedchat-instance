@@ -22,6 +22,7 @@ jobs:
       runs-on: ubuntu-latest
       outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
+        hasMatrix: ${{ steps.set-matrix.outputs.hasMatrix }}
       steps:
         - uses: actions/checkout@v4
           with:
@@ -36,14 +37,15 @@ jobs:
           id: set-matrix
           run: |
             cat ./config.json
+            cat hasMatrix
             echo "matrix=$(jq -c . < ./config.json)" >> $GITHUB_OUTPUT
-            echo "matrix=$(jq -c . < ./config.json)" >> $GITHUB_OUTPUT
+            echo "hasMatrix=$(cat hasMatrix)" >> $GITHUB_OUTPUT
             
     loop:
       runs-on: ubuntu-latest
       needs: 
         - setup
-      if: steps.setup.outputs.matrix != '{"include": []}'
+      if: needs.setup.outputs.hasMatrix == 'true'
       strategy:
         matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
       steps:

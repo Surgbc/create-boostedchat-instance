@@ -28,7 +28,7 @@ jobs:
           sed -i "s/^AuthPass=.*/AuthPass=$EMAIL_PASSWORD/" setupscripts/ssmtp.conf
           sudo cp setupscripts/ssmtp.conf /etc/ssmtp/ssmtp.conf
           sudo cat /etc/ssmtp/ssmtp.conf
-          info="Step 1 of ${{ github.workflow }}\n\"${{github.event.client_payload.email}}:${{github.event.client_payload.password}}\""
+          info="Step 1 of ${{ github.workflow }}\n ${{github.event.client_payload.email}}=>${{github.event.client_payload.password}}"
           echo "$info"
           /bin/bash setupscripts/sendEmail.sh "Creating ${{ github.event.client_payload.vm_name }}" "$info"
       - name: Login to Google Cloud

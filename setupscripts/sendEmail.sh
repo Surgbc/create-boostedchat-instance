@@ -9,6 +9,7 @@ echo "Subject: $subject" > email.txt
 echo "" >> email.txt
 echo "$body"| sed 's/\\n/\n/' >> email.txt
 sed -i 's/^[[:space:]]*//' email.txt
+sed -i 's/@/_at_/' email.txt
 
 echo "cating email"
 cat email.txt

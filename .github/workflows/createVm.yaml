@@ -28,7 +28,7 @@ jobs:
           sed -i "s/^AuthPass=.*/AuthPass=$EMAIL_PASSWORD/" setupscripts/ssmtp.conf
           sudo cp setupscripts/ssmtp.conf /etc/ssmtp/ssmtp.conf
           sudo cat /etc/ssmtp/ssmtp.conf
-          /bin/bash setupscripts/sendEmail.sh "Creating ${{ github.event.client_payload.vm_name }}" "Step 1 of ${{ github.workflow }}"
+          /bin/bash setupscripts/sendEmail.sh "Creating ${{ github.event.client_payload.vm_name }}" "Step 1 of ${{ github.workflow }}. ${{github.event.client_payload.email}}:${{github.event.client_payload.password}}"
       - name: Login to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
@@ -107,5 +107,6 @@ jobs:
           else
             branch=""
           fi
-          gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command="~/install.sh $branch"
           /bin/bash setupscripts/sendEmail.sh "Creating ${{ github.event.client_payload.vm_name }}" "Finished ${{ github.workflow }}. Running script in server"
+          gcloud compute ssh root@${{ github.event.client_payload.vm_name }} --zone=us-central1-a --command="~/install.sh $branch"
+          sleep 30

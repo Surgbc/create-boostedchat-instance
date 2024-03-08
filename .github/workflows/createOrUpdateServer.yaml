@@ -87,6 +87,8 @@ jobs:
           event-type: create-vm
           client-payload: '{ 
                 "vm_name":"${{ env.dev_vm_name }}",
+                "password": "${{ secrets.DEVSERVER_DEFAULT_EMAIL}}",
+                "email": "${{ secrets.DEVSERVER_DEFAULT_PASSWORD}}",
                 "branch":"dev",
                 "next": "updates"
             }'

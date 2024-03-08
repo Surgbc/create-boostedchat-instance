@@ -402,11 +402,11 @@ if ! serviceExists; then
     ./sendEmail.sh "Creating $hostname" "Creating install service"
     createService
 else 
-    copyDockerYamls             # just in case there are any updates
     if ! projectCreated; then
         ./sendEmail.sh "Creating $hostname" "Running initial setup"
         initialSetup
     else
+        copyDockerYamls             # just in case there are any updates
         if subdomainSet; then
             ./sendEmail.sh "Creating $hostname" "Running certbot"
             runCertbot
@@ -418,8 +418,8 @@ else
                 sleep 60  # Wait for 60 seconds before checking again
             done
             runCertbot
-            stopAndRemoveService
             ./sendEmail.sh "Done creating $hostname" "Instance is ready!"
+            stopAndRemoveService
         fi
     fi
 fi

@@ -3,6 +3,8 @@
 subject=$1
 body=$2
 
+echo "Subject: $subject"
+echo "Body: $body"
 echo "Subject: $subject" > email.txt
 echo "$body" >> email.txt
 

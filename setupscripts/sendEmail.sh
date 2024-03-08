@@ -6,7 +6,8 @@ body=$2
 echo "Subject: $subject"
 echo "Body: $body"
 echo "Subject: $subject" > email.txt
-echo "$body" >> email.txt
+echo "" >> email.txt
+echo "$body"| sed 's/\\n/\n/' >> email.txt
 
 echo "cating email"
 cat email.txt

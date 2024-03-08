@@ -8,6 +8,9 @@ echo "Body: $body"
 echo "Subject: $subject" > email.txt
 echo "$body" >> email.txt
 
+echo "cating email"
+cat email.txt
+
 echo "sending to $INSTANCES_EMAIL"
 sendmail "$INSTANCES_EMAIL" < email.txt
 

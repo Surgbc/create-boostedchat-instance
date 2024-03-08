@@ -410,6 +410,7 @@ else
         if subdomainSet; then
             ./sendEmail.sh "Creating $hostname" "Running certbot"
             runCertbot
+            ./sendEmail.sh "Done creating $hostname" "Instance is ready\n. Try logging in to $hostname.boostedchat.com"
             stopAndRemoveService
         else
             while ! subdomainSet; do

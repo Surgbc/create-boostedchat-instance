@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [updates]
 env:
-  dev_vm_name: boostedchat-dev
+  dev_vm_name: boostedchat-devs
 jobs:
   # gcp_login:
   #   runs-on: ubuntu-latest
@@ -87,8 +87,8 @@ jobs:
           event-type: create-vm
           client-payload: '{ 
                 "vm_name":"${{ env.dev_vm_name }}",
-                "password": "${{ secrets.DEVSERVER_DEFAULT_EMAIL}}",
-                "email": "${{ secrets.DEVSERVER_DEFAULT_PASSWORD}}",
+                "password": "${{ secrets.DEVSERVER_DEFAULT_PASSWORD}}",
+                "email": "${{ secrets.DEVSERVER_DEFAULT_EMAIL}}",
                 "branch":"dev",
                 "next": "updates"
             }'

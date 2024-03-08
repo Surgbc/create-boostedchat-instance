@@ -291,6 +291,64 @@ projectCreated() {
     fi
 }
 
+
+
+# Function to test subdomains and write results to a file
+test_sites() {
+    source <(sed 's/^/export /' ~/boostedchat-site/.env ) >/dev/null  
+    cd ~
+    local subdomain_="$hostname"
+    local domain="boostedchat.com"
+    subdomains=(
+        "${subdomain_}.${domain}"
+        "airflow.${subdomain_}.${domain}"
+        "api.${subdomain_}.${domain}"
+        "promptemplate.${subdomain_}.${domain}"
+        "scrapper.${subdomain_}.${domain}"
+    )
+    echo "Subject: Tests for $hostname" > results.txt
+    echo "Content-Type: text/html" >> results.txt
+    echo "" >> results.txt
+    echo "<p><b>SERVERS:</b></p>" >> results.txt
+    for subdomain in "${subdomains[@]}"; do
+        if [[ "$subdomain" == api.* ]]; then
+            subdomain="$subdomain/admin/login/?next=/admin/"
+        fi
+        if [[ "$subdomain" == airflow.* ]]; then
+            subdomain="$subdomain/login/"
+        fi
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" "https://$subdomain")
+        if [ "$response_code" == "200" ]; then
+            echo "$subdomain: 200 OK<br>" >> results.txt
+        else
+            echo "$subdomain: $response_code<br>" >> results.txt
+        fi
+    done
+
+    cd /root/boostedchat-site
+    echo "<p><b>DATABASES:</b></p>" >> ../results.txt
+    if docker compose exec postgres psql -h "localhost" -U "postgres" -d "$hostname" -p 5432 -c "SELECT 1;" > /dev/null 2>&1; then
+        echo "postgres: Connection successful<br>" >> ../results.txt
+        else
+        echo "postgres: Connection failed<br>" >> ../results.txt
+    fi 
+    if docker compose -f /root/boostedchat-site/docker-compose.airflow.yaml exec postgresetl  psql -h "localhost" -U "postgres" -d "etl" -p 5433 -c "SELECT 1;" > /dev/null 2>&1; then
+        echo "postgresetl: Connection successful<br>" >> ../results.txt
+        else
+        echo "postgresetl: Connection failed<br>" >> ../results.txt
+    fi 
+    if docker compose exec postgres-promptfactory  psql -h "localhost" -U "postgres" -d "promptfactory" -p 5434 -c "SELECT 1;" > /dev/null 2>&1; then
+        echo "promptfactory: Connection successful<br>" >> ../results.txt
+        else
+        echo "promptfactory: Connection failed<br>" >> ../results.txt
+    fi 
+
+    cd ..
+    
+    
+    sendmail "$INSTANCES_EMAIL" < results.txt
+}
+
 subdomainSet() {
     if certificates_exist; then 
         return 0
@@ -410,7 +468,9 @@ else
         if subdomainSet; then
             ./sendEmail.sh "Creating $hostname" "Running certbot"
             runCertbot
+            cd ~
             ./sendEmail.sh "Done creating $hostname" "Instance is ready\n. Try logging in to $hostname.boostedchat.com"
+            test_sites
             stopAndRemoveService
         else
             while ! subdomainSet; do
@@ -419,7 +479,9 @@ else
                 sleep 60  # Wait for 60 seconds before checking again
             done
             runCertbot
+            cd ~
             ./sendEmail.sh "Done creating $hostname" "Instance is ready!"
+            test_sites
             stopAndRemoveService
         fi
     fi

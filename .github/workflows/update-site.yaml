@@ -41,11 +41,12 @@ jobs:
       - name: Loop and Update
         run: |
           cat instances.txt
+          cat zones.txt
           index=1
           while IFS= read -r instance; do
             echo $instance
             zone=$(sed -n "${index}p" zones.txt)
             ((index++))
-            gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh && gcloud compute ssh $instance --command="chmod +x /root/update-site.sh && bash /root/update-site.sh"
+            gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh --zone=$zone && gcloud compute ssh $instance --zone=$zone --command="chmod +x /root/update-site.sh && bash /root/update-site.sh"
           done < instances.txt
           sleep 30

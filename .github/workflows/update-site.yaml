@@ -37,8 +37,8 @@ jobs:
           # it will be less resource intensive to run it from here
       - name: Loop and Update
         run: |
-          instances=$instances
-          for instance in $instances; do
+          while IFS= read -r instance; do
+            echo $instance
             gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh && gcloud compute ssh $instance --command="chmod +x /root/update-site.sh && bash /root/update-site.sh"
-          done
+          done < instances.txt
           sleep 30

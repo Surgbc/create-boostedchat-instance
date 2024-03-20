@@ -18,6 +18,8 @@ jobs:
     outputs:
       vms: ${{ steps.list_instances.outputs.instances }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Login to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1

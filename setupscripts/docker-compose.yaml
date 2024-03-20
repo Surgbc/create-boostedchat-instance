@@ -130,6 +130,23 @@ services:
     restart: always
     networks:
       - booksy
+  redis1:
+    image: redis:latest
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6379", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 30s
+    restart: always
+    ports:
+      - "6380:6379"
+    volumes:
+      - redisdata1:/data
+    networks:
+      - booksy
 
 volumes:
   web-django:

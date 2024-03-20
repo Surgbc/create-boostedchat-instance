@@ -30,15 +30,22 @@ jobs:
       - name: List vms
         id: list_instances
         run: |
-          gcloud compute instances list --format="value(name)" > instances.txt
+          gcloud compute instances list --format="value(name, zone)" > instances.txt
+          cp instances.txt zones.txt
+          sed -i 's/\s.*//' instances.txt # remove all but the first
+          sed -i 's/.*\s\([^ ]*\)$/\1/' zones.txt # remove all but the last
           #   instances=$(cat instances.txt | base64 -w 0)
           # echo "instances=$instances" >> $GITHUB_OUTPUT
           instances=$(cat instances.txt)
           # it will be less resource intensive to run it from here
       - name: Loop and Update
         run: |
+          cat instances.txt
+          index=1
           while IFS= read -r instance; do
             echo $instance
+            zone=$(sed -n "${index}p" zones.txt)
+            ((index++))
             gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh && gcloud compute ssh $instance --command="chmod +x /root/update-site.sh && bash /root/update-site.sh"
           done < instances.txt
           sleep 30

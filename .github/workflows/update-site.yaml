@@ -42,11 +42,15 @@ jobs:
         run: |
           cat instances.txt
           cat zones.txt
+          echo "#!/bin/bash" > updateInstances.sh
           index=1
           while IFS= read -r instance; do
             echo $instance
             zone=$(sed -n "${index}p" zones.txt)
             ((index++))
-            gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh --zone=$zone && gcloud compute ssh $instance --zone=$zone --command="chmod +x /root/update-site.sh && bash /root/update-site.sh"
+            echo "gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh --zone=$zone" >> updateInstances.sh
+            echo "gcloud compute ssh $instance --zone=$zone --command=\"chmod +x /root/update-site.sh && bash /root/update-site.sh\""  >> updateInstances.sh
           done < instances.txt
+          cat updateInstances.sh
+          bash updateInstances.sh
           sleep 30

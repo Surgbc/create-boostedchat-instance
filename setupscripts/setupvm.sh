@@ -446,6 +446,23 @@ runCertbot() {
 
 ## replace with certbotEntryPoint
 
+FUNCTION="$2"
+
+if [ "$#" -eq 2 ]; then
+    # Call the specified function
+    case "$FUNCTION" in
+        "copyDockerYamls")
+            copyDockerYamls
+            ;;
+        *)
+            echo "Invalid function name"
+            exit 1
+            ;;
+    esac
+    exit 0
+fi
+
+
 if [ ! -f "/root/watch.sh" ]; then
     createUpdateService
 fi

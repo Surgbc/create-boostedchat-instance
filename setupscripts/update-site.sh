@@ -27,7 +27,8 @@ if command -v git &> /dev/null; then
     # Copy install.sh from boostedchat-site to /root/install.sh
     cp install.sh /root/install.sh
     chmod +x /root/install.sh
-    bash /root/install.sh "$branch" copyDockerYamls
+    
+    # bash /root/install.sh "$branch" copyDockerYamls
 else
     echo "Git is not installed. Please install Git to use this script."
 fi

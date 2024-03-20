@@ -31,26 +31,14 @@ jobs:
         id: list_instances
         run: |
           gcloud compute instances list --format="value(name)" > instances.txt
-          instances=$(cat instances.txt | base64 - w 0)
-          echo "instances=$instances" >> $GITHUB_OUTPUT
+          #   instances=$(cat instances.txt | base64 -w 0)
+          # echo "instances=$instances" >> $GITHUB_OUTPUT
+          instances=$(cat instances.txt)
           # it will be less resource intensive to run it from here
-  update_existing:
-    runs-on: ubuntu-latest
-    needs:
-      - get_instances
-    strategy:
-      matrix: ${{ fromJson(needs.get_instances.outputs.vms) }}
-    steps:
-      - run: |
-          echo ${{ github.event.client_payload.branch }}
-      - name: Trigger VM Update
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: "${{ github.repository }}"
-          event-type: update-vm
-          client-payload: '{ 
-                "vm_name":"${{ github.event.client_payload.vm_name }}"
-            }'
-
-  
+      - name: Loop and Update
+        run: |
+          instances=$instances
+          for instance in $instances; do
+            gcloud compute scp setupscripts/update-site.sh $instance:/root/update-site.sh && gcloud compute ssh $instance --command="chmod +x /root/update-site.sh && bash /root/update-site.sh"
+          done
+          sleep 30

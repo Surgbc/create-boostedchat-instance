@@ -59,7 +59,7 @@ jobs:
             git branch
             echo "11111"
             git fetch origin1 main
-            git rebase origin1/main
+            git merge origin1/main
             git log -n 1
             git pull origin1 dev --rebase
             git log -n 1

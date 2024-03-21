@@ -160,6 +160,6 @@ jobs:
             cat updateInstances.sh
             bash updateInstances.sh
             sleep 30
-            git checkout "${{ env.branch }}"
+            # git checkout "${{ env.branch }}"
 
           

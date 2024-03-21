@@ -49,21 +49,27 @@ jobs:
             target-branch: main
       - name: Clone boostedchat-site dev branch
         run: | # use the dev branch
-            rm -rf "$REPO_NAME"
-            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b dev
-            cd "$REPO_NAME"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git config user.name "GitHub Actions"
-            git log -n 1
+            cd  "$REPO_NAME"
             git remote add origin1 https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git
-            git branch
-            echo "11111"
-            git fetch origin1 main
+            git pull origin1 dev
+            git checkout dev
             git merge origin1/main
-            git log -n 1
-            git pull origin1 dev --rebase
-            git log -n 1
-            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git dev
+            git push origin1 dev
+
+            # git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b dev
+            # cd "$REPO_NAME"
+            # git config user.email "github-actions[bot]@users.noreply.github.com"
+            # git config user.name "GitHub Actions"
+            # git log -n 1
+            # git remote add origin1 https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git
+            # git branch
+            # echo "11111"
+            # git fetch origin1 main
+            # git merge origin1/main
+            # git log -n 1
+            # git pull origin1 dev --rebase
+            # git log -n 1
+            # git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git dev
       - uses: gliech/create-github-secret-action@v1
         with:
           location: "${{ github.repository_owner }}/boostedchat-site"

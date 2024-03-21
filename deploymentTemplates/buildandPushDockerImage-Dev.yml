@@ -114,6 +114,9 @@ jobs:
             git add . && git commit -m "tmp"
             echo "branch=$branch"  >> $GITHUB_ENV
             git remote set-url origin https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository}}.git
+            # git pull origin/master
+            git ls-remote --heads origin
+            git fetch origin
             git checkout origin/master
         # - uses: actions/checkout@v4
         - name: Login to Google Cloud

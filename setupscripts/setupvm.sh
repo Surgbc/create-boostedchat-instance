@@ -467,6 +467,7 @@ FUNCTION="$2"
 
 if [ "$#" -eq 2 ]; then
     # Call the specified function
+    echo $FUNCTION
     case "$FUNCTION" in
         "copyDockerYamls")
             copyDockerYamls

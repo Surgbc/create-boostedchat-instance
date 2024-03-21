@@ -13,6 +13,7 @@ on:
   push:
     branches:
       - master
+      - dev
     paths: # on changes to scripts
       - 'setupscripts/**'
 permissions:
@@ -23,12 +24,16 @@ jobs:
   build-linux-packages:
     name: "Push to BoostedChat-Site"
     runs-on: "ubuntu-latest"
+    # env:
+    #   BRANCH: ${GITHUB_REF/refs\/heads\//}
     steps: 
       - uses: actions/checkout@v4
       ## clone it first,,,, test with a differnt repo...
+      - run: |
+          echo "BRANCH=${GITHUB_REF/refs\/heads\//}" >> $GITHUB_ENV
       - name: Clone boostedchat-site
         run: | # use the dev branch
-            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b dev
+            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b ${{env.BRANCH}}
             cd  setupscripts/
             chmod +x copy_dev_docker_file.sh
             ./copy_dev_docker_file.sh 
@@ -46,7 +51,7 @@ jobs:
             destination-github-username: ${{ github.repository_owner }}
             destination-repository-name: ${{ env.REPO_NAME }}
             user-email: "github-actions[bot]@users.noreply.github.com"
-            target-branch: dev
+            target-branch: ${{env.BRANCH}}
       - uses: gliech/create-github-secret-action@v1
         with:
           location: "${{ github.repository_owner }}/boostedchat-site"

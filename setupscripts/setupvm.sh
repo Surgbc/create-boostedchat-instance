@@ -62,6 +62,20 @@ copyDockerYamls() {
     fi
 }
 
+editNginxConf() {
+    dir=$(pwd)
+    cd /root/boostedchat-site
+
+    sed -i 's/$http_host/127.0.0.1/g' ./nginx-conf/nginx.conf
+
+    sed -i "s/jamel/$hostname/g" ./nginx-conf/*
+    sed -i "s/jamel/$hostname/g" ./nginx-conf.1/*
+
+    cd "$dir"
+}
+
+
+
 createService() {
     local current_dir=$(pwd)
     local script_name=$(basename "$0")
@@ -180,10 +194,13 @@ initialSetup() {
     # cp ./nginx-conf/nginx.nossl.conf ./nginx-conf/nginx.conf
     cp ./nginx-conf.1/nginx.nossl.conf ./nginx-conf/nginx.conf
     #
-    sed -i 's/$http_host/127.0.0.1/g' ./nginx-conf/nginx.conf
 
-    sed -i "s/jamel/$hostname/g" ./nginx-conf/*
-    sed -i "s/jamel/$hostname/g" ./nginx-conf.1/*
+
+    # sed -i 's/$http_host/127.0.0.1/g' ./nginx-conf/nginx.conf
+
+    # sed -i "s/jamel/$hostname/g" ./nginx-conf/*
+    # sed -i "s/jamel/$hostname/g" ./nginx-conf.1/*
+    editNginxConf
 
     ## set up env variables
     cp /etc/boostedchat/.env ./
@@ -453,6 +470,9 @@ if [ "$#" -eq 2 ]; then
     case "$FUNCTION" in
         "copyDockerYamls")
             copyDockerYamls
+            ;;
+        "editNginxConf")
+            editNginxConf
             ;;
         *)
             echo "Invalid function name"

@@ -157,6 +157,7 @@ volumes:
   rabbitmq-log:
   web-root:
   dhparam:
+  redisdata1:
 
 networks:
   booksy:

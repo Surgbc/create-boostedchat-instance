@@ -19,16 +19,32 @@ if command -v git &> /dev/null; then
     branch=$(git rev-parse --abbrev-ref HEAD)
     echo "Current branch: $branch"
 
-    # Pull the latest changes from the current branch using SSH (forcefully overwrite local changes)
-        git stash
-    GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git pull -f origin "$branch"
-        rsync -av nginx-conf/ nginx-conf.1/
-        rm nginx-conf/nginx.nossl.conf
-    # Copy install.sh from boostedchat-site to /root/install.sh
-    cp install.sh /root/install.sh
-    chmod +x /root/install.sh
+    # # Pull the latest changes from the current branch using SSH (forcefully overwrite local changes)
+    #     git stash
+    # GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git pull -f origin "$branch"
+    #     rsync -av nginx-conf/ nginx-conf.1/
+    #     rm nginx-conf/nginx.nossl.conf
+    # # Copy install.sh from boostedchat-site to /root/install.sh
+    # cp install.sh /root/install.sh
+    # chmod +x /root/install.sh
     
     # bash /root/install.sh "$branch" copyDockerYamls
+    # bash /root/install.sh "$branch" editNginxConf
+    if [[ "$branch" == "dev" || "$branch" == "main" ]]; then
+        # Pull the latest changes from the current branch using SSH (forcefully overwrite local changes)
+        git stash
+        GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git pull -f origin "$branch"
+        rsync -av nginx-conf/ nginx-conf.1/
+        rm nginx-conf/nginx.nossl.conf
+        # Copy install.sh from boostedchat-site to /root/install.sh
+        cp install.sh /root/install.sh
+        chmod +x /root/install.sh
+    
+        bash /root/install.sh "$branch" copyDockerYamls
+        bash /root/install.sh "$branch" editNginxConf
+    else
+        echo "Skipping execution as the branch is not dev or main."
+    fi
 else
     echo "Git is not installed. Please install Git to use this script."
 fi

@@ -104,55 +104,45 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.REPO_ACCESS_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/${{ github.repository }}/git/refs/heads/${{ matrix.service }}-${{ matrix.branch }}
-
-## After triggering updates, 
-## 
-    # updates:
-    #   needs: 
-    #     - loop
-    #   runs-on: ubuntu-latest
-    #   timeout-minutes: 90
-    #   permissions:
-    #     contents: 'read'
-    #     id-token: 'write'
-    #   steps:
-    #     - name: Login to Google Cloud
-    #       id: auth
-    #       uses: google-github-actions/auth@v1
-    #       with:
-    #         token_format: access_token
-    #         workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
-    #         service_account: ${{ secrets.SERVICE_ACCOUNT }}
-    #     - name: Set up Cloud SDK
-    #       uses: google-github-actions/setup-gcloud@v0.3.0
-  
-    #     - name: set credential_file
-    #       run: gcloud auth login --cred-file=${{steps.auth.outputs.credentials_file_path}}
-        
-    #     # - name: List vms
-    #     #   id: list-instances
-    #     #   run: |
-    #     #     gcloud compute instances list --format="value(name)" > instances.txt
-
-    #     - name: SSH and Update File
-    #       run: | # the while loop does not await
-    #         # while read -r instance zone; do
-    #         #   echo "Instance: $instance, Zone: $zone"
-    #         #   sleep 10 # wait for first process to generate ssh key
-    #         #   gcloud compute ssh $instance --zone=$zone --command "echo \$(date) | sudo tee /root/update" &
-    #         # done <<< "$(gcloud compute instances list --format="value(name,zone)")"
-    #         # wait 
-
-    #         while read -r instance zone; do
-    #           echo "Instance: $instance, Zone: $zone"
-    #           echo "gcloud compute ssh $instance --zone=$zone --command \"echo \$(date) | sudo tee /root/update\" " >> tmp.sh
-    #         done <<< "$(gcloud compute instances list --format="value(name,zone)")"
-
-    #         /bin/bash tmp.sh
-    
-            
-            
-            
-
-   
-  
+        - run: |
+            rm -rf $(pwd)
+        - uses: actions/checkout@v4
+        - name: Login to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER_ID }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.3.0
+      - name: List vms
+        id: list_instances
+        run: |
+          gcloud compute instances list --format="value(name, zone)" > instances.txt
+          cp instances.txt zones.txt
+          sed -i 's/\s.*//' instances.txt # remove all but the first
+          sed -i 's/.*\s\([^ ]*\)$/\1/' zones.txt # remove all but the last
+          #   instances=$(cat instances.txt | base64 -w 0)
+          # echo "instances=$instances" >> $GITHUB_OUTPUT
+          instances=$(cat instances.txt)
+          # it will be less resource intensive to run it from here
+      - name: Loop and Update
+        run: |
+          cat instances.txt
+          cat zones.txt
+          echo "#!/bin/bash" > updateInstances.sh
+          index=1
+          echo "updating service: ${{ matrix.service }}"
+          while IFS= read -r instance; do
+            echo $instance
+            zone=$(sed -n "${index}p" zones.txt)
+            ((index++))
+            echo "gcloud compute scp setupscripts/update-microservices.sh $instance:/tmp/update-microservices.sh --zone=$zone" >> updateInstances.sh
+            #echo "gcloud compute ssh $instance --zone=$zone --command=\"sudo chmod +x /tmp/update-microservices.sh \""  >> updateInstances.sh
+            echo "gcloud compute ssh $instance --zone=$zone --command=\"sudo chmod +x /tmp/update-microservices.sh && sudo bash /tmp/update-microservices.sh ${{ matrix.service }}\""  >> updateInstances.sh
+          done < instances.txt
+          cat updateInstances.sh
+          bash updateInstances.sh
+          sleep 30
+          

@@ -54,6 +54,8 @@ jobs:
             git config user.name "GitHub Actions"
             git remote -v
             git remote set-url origin https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git
+            git stash
+            git pull origin main
             git pull origin dev
             git checkout dev
             git merge origin/main

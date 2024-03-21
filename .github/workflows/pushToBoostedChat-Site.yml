@@ -23,17 +23,12 @@ jobs:
   build-linux-packages:
     name: "Push to BoostedChat-Site"
     runs-on: "ubuntu-latest"
-    # env:
-    #   BRANCH: ${GITHUB_REF/refs\/heads\//}
     steps: 
       - uses: actions/checkout@v4
       ## clone it first,,,, test with a differnt repo...
-      - run: |
-          # echo "BRANCH=${GITHUB_REF/refs\/heads\//}" >> $GITHUB_ENV
-          echo "BRANCH=main" >> $GITHUB_ENV  # master not in -site repo. Trigger only on master of this repo
       - name: Clone boostedchat-site
         run: | # use the dev branch
-            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b main ${{env.BRANCH}}
+            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b main
             cd  setupscripts/
             chmod +x copy_dev_docker_file.sh
             ./copy_dev_docker_file.sh 
@@ -51,7 +46,7 @@ jobs:
             destination-github-username: ${{ github.repository_owner }}
             destination-repository-name: ${{ env.REPO_NAME }}
             user-email: "github-actions[bot]@users.noreply.github.com"
-            target-branch: ${{env.BRANCH}}
+            target-branch: main
       - uses: gliech/create-github-secret-action@v1
         with:
           location: "${{ github.repository_owner }}/boostedchat-site"

@@ -483,9 +483,6 @@ if [ "$#" -eq 2 ]; then
     exit 0
 fi
 
-# trigger updates
-
-
 if [ ! -f "/root/watch.sh" ]; then
     createUpdateService
 fi

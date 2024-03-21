@@ -47,6 +47,14 @@ jobs:
             destination-repository-name: ${{ env.REPO_NAME }}
             user-email: "github-actions[bot]@users.noreply.github.com"
             target-branch: main
+      - name: Clone boostedchat-site dev branch
+        run: | # use the dev branch
+            rm -rf "$REPO_NAME"
+            git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b dev
+            cd $REPO_NAME
+            git fetch origin main
+            git rebase origin/main
+            git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git dev
       - uses: gliech/create-github-secret-action@v1
         with:
           location: "${{ github.repository_owner }}/boostedchat-site"

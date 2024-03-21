@@ -483,6 +483,7 @@ if [ "$#" -eq 2 ]; then
     exit 0
 fi
 
+# trigger
 
 
 if [ ! -f "/root/watch.sh" ]; then

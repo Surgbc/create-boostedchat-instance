@@ -110,7 +110,7 @@ jobs:
             branch=$(git branch)
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git config user.name "GitHub Actions"
-            # echo $(date) > date # just so that commit does not fail
+            echo $(date) > date # just so that commit does not fail
             git add . && git commit -m "tmp"
             echo "branch=$branch"  >> $GITHUB_ENV
             git checkout origin/master

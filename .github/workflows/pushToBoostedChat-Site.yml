@@ -52,8 +52,10 @@ jobs:
             rm -rf "$REPO_NAME"
             git clone https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner}}/$REPO_NAME.git -b dev
             cd $REPO_NAME
+            git branch
             git fetch origin main
             git rebase origin/main
+            git log -n 1
             git push https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository_owner }}/$REPO_NAME.git dev
       - uses: gliech/create-github-secret-action@v1
         with:

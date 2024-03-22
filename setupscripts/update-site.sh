@@ -32,7 +32,7 @@ if command -v git &> /dev/null; then
     # bash /root/install.sh "$branch" editNginxConf
     if [[ "$branch" == "dev" || "$branch" == "main" ]]; then
         # Pull the latest changes from the current branch using SSH (forcefully overwrite local changes)
-        git stash
+        # git stash
         GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git pull -f origin "$branch"
         rsync -av nginx-conf/ nginx-conf.1/
         rm nginx-conf/nginx.nossl.conf

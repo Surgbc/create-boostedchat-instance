@@ -21,9 +21,9 @@ function api() {
 }
 
 function mqtt() {
-    docker compose stop api
-    docker compose pull api
-    docker compose up -d --build api
+    docker compose stop mqtt
+    docker compose pull mqtt
+    docker compose up -d --build mqtt
 }
 
 function prompt() {
@@ -47,6 +47,7 @@ if [ $# -ne 1 ]; then
 fi
 
 cd /root/boostedchat-site
+echo $1
 # Run function based on argument
 case $1 in
     "client")

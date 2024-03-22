@@ -412,10 +412,10 @@ subdomainSet() {
 }
 
 stopAndRemoveService() {
-    sudo systemctl stop $service_name
     sudo systemctl disable $service_name
     sudo rm /etc/systemd/system/$service_name.service
     sudo systemctl daemon-reload
+    sudo systemctl stop $service_name
 }
 
 certificates_exist() {

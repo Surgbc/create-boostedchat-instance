@@ -155,7 +155,7 @@ jobs:
               ((index++))
               echo "gcloud compute scp setupscripts/update-microservices.sh $instance:/tmp/update-microservices.sh --zone=$zone" >> updateInstances.sh
               #echo "gcloud compute ssh $instance --zone=$zone --command=\"sudo chmod +x /tmp/update-microservices.sh \""  >> updateInstances.sh
-              echo "gcloud compute ssh $instance --zone=$zone --command=\"sudo chmod +x /tmp/update-microservices.sh && sudo bash /tmp/update-microservices.sh ${{ matrix.service }}\""  >> updateInstances.sh
+              echo "gcloud compute ssh $instance --zone=$zone --command=\"sudo chmod +x /tmp/update-microservices.sh && sudo bash /tmp/update-microservices.sh update ${{ matrix.service }}\""  >> updateInstances.sh
             done < instances.txt
             cat updateInstances.sh
             bash updateInstances.sh

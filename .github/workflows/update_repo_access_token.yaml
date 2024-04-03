@@ -1,0 +1,45 @@
+name: Update Repo Secrets
+
+on:
+  workflow_dispatch:  # Manual trigger for testing
+  push:
+    branches:
+      - master
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      file_contents: ${{ steps.read_file.outputs.file_contents }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get held repos list
+        id: set-matrix
+        env:
+          PAT: ${{ secrets.REPO_ACCESS_TOKEN }}
+        run: |
+          ./localscripts/getHeldRepos.sh ${{ github.repository_owner }}
+          echo "matrix=$(jq -c . < ./heldRepos.json)" >> $GITHUB_OUTPUT
+      - uses: gliech/create-github-secret-action@v1
+        name: set access token for -site
+        with:
+          location: ${{ github.repository_owner }}/boostedchat-site
+          name: REPO_ACCESS_TOKEN
+          value: ${{ secrets.REPO_ACCESS_TOKEN }}
+          org_visibility: private
+          pa_token: ${{ secrets.REPO_ACCESS_TOKEN }}
+  loop:
+    runs-on: ubuntu-latest
+    needs: 
+      - setup
+    strategy:
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+    steps:
+      - uses: gliech/create-github-secret-action@v1
+        with:
+          location: ${{ matrix.org }}/${{ matrix.repo }}
+          name: REPO_ACCESS_TOKEN
+          value: ${{ secrets.REPO_ACCESS_TOKEN }}
+          org_visibility: private
+          pa_token: ${{ secrets.REPO_ACCESS_TOKEN }}

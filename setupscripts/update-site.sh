@@ -1,5 +1,42 @@
-
 #!/bin/bash
+
+update_service_name="updatedboostedchatsite"
+## if an argument is supplied run the below
+
+# Check 2 arguments supplied
+if [ $# -eq 2 ]; then
+
+    cat <<EOF > "/etc/systemd/system/$update_service_name.service"
+[Unit]
+Description=Update boostedchat site
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/tmp
+Environment="HOME=/root"
+ExecStart=/tmp/update-site.sh abc
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Reload systemd to read the newly added unit files
+        sudo systemctl daemon-reload
+
+        # Start and enable the service
+        sudo systemctl start $update_service_name
+        sudo systemctl enable $update_service_name
+
+        # Check service status
+        sudo systemctl status $update_service_name
+
+exit 0
+fi
 
 which rsync || apt install rsync
 # Change to the /root/boostedchat-site directory
@@ -18,15 +55,6 @@ if command -v git &> /dev/null; then
     # Get the current branch using Git
     branch=$(git rev-parse --abbrev-ref HEAD)
     echo "Current branch: $branch"
-
-    # # Pull the latest changes from the current branch using SSH (forcefully overwrite local changes)
-    #     git stash
-    # GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa_git -o StrictHostKeyChecking=no' git pull -f origin "$branch"
-    #     rsync -av nginx-conf/ nginx-conf.1/
-    #     rm nginx-conf/nginx.nossl.conf
-    # # Copy install.sh from boostedchat-site to /root/install.sh
-    # cp install.sh /root/install.sh
-    # chmod +x /root/install.sh
     
     # bash /root/install.sh "$branch" copyDockerYamls
     # bash /root/install.sh "$branch" editNginxConf
@@ -48,3 +76,28 @@ if command -v git &> /dev/null; then
 else
     echo "Git is not installed. Please install Git to use this script."
 fi
+
+
+
+function remove_service() {
+    # Stop and disable the service
+    # sudo systemctl stop $update_service_name
+    
+
+    # Remove the service file
+    sudo rm "/etc/systemd/system/$update_service_name.service"
+    sudo systemctl disable $update_service_name
+    # Reload systemd
+    sudo systemctl daemon-reload
+
+    # Check service status (optional)
+    systemctl status $update_service_name
+    rm /tmp/update-site.sh
+    sudo systemctl stop $update_service_name
+}
+
+echo "removing service"
+# Remove microservice if no argument is supplied
+remove_service
+# this will not run since the service will be stopped in the previous step
+echo "end of script"

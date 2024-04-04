@@ -8,6 +8,7 @@ subdomains=(
     "api.${subdomain}"
     "promptemplate.${subdomain}"
     "scrapper.${subdomain}"
+    "mqtt.${subdomain}"
 )
 
 # Cloudflare API endpoint URL

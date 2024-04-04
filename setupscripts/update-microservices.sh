@@ -3,7 +3,7 @@
 update_service_name="updatedboostedchatmses"
 ## if an argument is supplied run the below
 
-# Check if an argument is supplied
+# Check 2 arguments supplied
 if [ $# -eq 2 ]; then
 
     cat <<EOF > "/etc/systemd/system/$update_service_name.service"
@@ -122,6 +122,7 @@ function remove_service() {
 
     # Check service status (optional)
     systemctl status $update_service_name
+    rm /tmp/update-microservices.sh
     sudo systemctl stop $update_service_name
 }
 

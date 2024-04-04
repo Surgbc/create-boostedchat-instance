@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+# "What does this code do?"
 PR_TITLE="Merge dev into main"
 PR_BODY="This is an automated pull request created by GitHub Actions"
 # PAT="${{ secrets.PAT }}"
